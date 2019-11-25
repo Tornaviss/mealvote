@@ -114,7 +114,7 @@ class MenuServiceTest {
     void updateNotExist() {
         Menu updated = getUpdated();
         updated.setId(MAFIA_ID);
-        assertThrows(IllegalOperationException.class, () ->
+        assertThrows(NotFoundException.class, () ->
                 service.update(updated, MAFIA_ID)
         );
     }

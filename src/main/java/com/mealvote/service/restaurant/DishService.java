@@ -1,6 +1,8 @@
 package com.mealvote.service.restaurant;
 
+import com.mealvote.model.audition.DishHistory;
 import com.mealvote.model.restaurant.Dish;
+import com.mealvote.repository.history.CrudDishHistoryRepository;
 import com.mealvote.repository.restaurant.CrudDishRepository;
 import com.mealvote.repository.restaurant.CrudMenuRepository;
 import com.mealvote.util.exception.NotFoundException;
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static com.mealvote.util.ValidationUtil.*;
@@ -21,11 +24,13 @@ public class DishService {
 
     private final CrudMenuRepository menuRepository;
 
+    private final CrudDishHistoryRepository historyRepository;
 
     @Autowired
-    public DishService(CrudDishRepository repository, CrudMenuRepository menuRepository) {
+    public DishService(CrudDishRepository repository, CrudMenuRepository menuRepository, CrudDishHistoryRepository historyRepository) {
         this.repository = repository;
         this.menuRepository = menuRepository;
+        this.historyRepository = historyRepository;
     }
 
     public Dish get(int id) {
@@ -59,5 +64,29 @@ public class DishService {
             throw new NotFoundException("id = " + dish.getId());
         }
         repository.save(dish);
+    }
+
+    public List<DishHistory> getHistory(int dishId) {
+        return historyRepository.getAllByDishId(dishId);
+    }
+
+    public List<DishHistory> getAllHistory() {
+        return historyRepository.getAll();
+    }
+
+    @Transactional
+    public void recover(int historyId) {
+        DishHistory dishHistory = checkNotFoundWithId(historyRepository.findById(historyId).orElse(null), historyId);
+        Dish dish = new Dish(dishHistory.getName(), dishHistory.getPrice());
+        dish.setId(dishHistory.getId());
+        if (!dishHistory.isActive()) {
+            historyRepository.activate(dishHistory.getId());
+            dish.setMenu(menuRepository.getOne(dishHistory.getMenuId()));
+        }
+        repository.save(dish);
+    }
+
+    public List<DishHistory> getMenuContentByDateTime(int menuId, LocalDateTime dateTime) {
+        return historyRepository.getMenuContentByDateTime(menuId, dateTime);
     }
 }

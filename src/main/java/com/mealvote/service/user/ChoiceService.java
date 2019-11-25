@@ -1,6 +1,8 @@
 package com.mealvote.service.user;
 
+import com.mealvote.model.audition.ChoiceHistory;
 import com.mealvote.model.user.Choice;
+import com.mealvote.repository.history.CrudChoiceHistoryRepository;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.repository.user.CrudChoiceRepository;
 import com.mealvote.repository.user.CrudUserRepository;
@@ -26,12 +28,15 @@ public class ChoiceService {
 
     private final CrudUserRepository userRepository;
 
+    private final CrudChoiceHistoryRepository historyRepository;
+
     @Autowired
     public ChoiceService(CrudChoiceRepository repository, CrudRestaurantRepository restaurantRepository,
-                         CrudUserRepository userRepository) {
+                         CrudUserRepository userRepository, CrudChoiceHistoryRepository historyRepository) {
         this.repository = repository;
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
+        this.historyRepository = historyRepository;
     }
 
     public List<Choice> getAll() {
@@ -70,6 +75,34 @@ public class ChoiceService {
         } else {
             throw new IllegalOperationException("choice for user " + userId + " cannot be changed now");
         }
+    }
+
+    public List<ChoiceHistory> getHistory(int userId) {
+        return historyRepository.getAllByUserId(userId);
+    }
+
+    public List<ChoiceHistory> getAllHistory() {
+        return historyRepository.getAll();
+    }
+
+    @Transactional
+    public void recover(int historyId) {
+        ChoiceHistory choiceHistory =
+                checkNotFoundWithId(historyRepository.findById(historyId).orElse(null), historyId);
+        Choice choice = new Choice();
+        choice.setDateTime(choiceHistory.getDateTime());
+        choice.setRestaurant(restaurantRepository.findById(choiceHistory.getRestaurantId())
+                .orElseThrow(() -> new NotFoundException("id = " + choiceHistory.getRestaurantId())));
+        int userId = choiceHistory.getUserId();
+        choice.setUser(userRepository.getOne(userId));
+
+        if (!choiceHistory.isActive()) {
+            if (repository.existsById(userId)) {
+                repository.deleteById(userId);
+            }
+        }
+
+        repository.save(choice);
     }
 
 }
