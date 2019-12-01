@@ -1,8 +1,11 @@
 package com.mealvote.web;
 
 import com.mealvote.AuthorizedUser;
+import com.mealvote.model.user.Role;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+
+import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
@@ -27,6 +30,14 @@ public class SecurityUtil {
     }
 
     public static int authUserId() {
-        return get().getUser().getId();
+        return get().getId();
+    }
+
+    public static Collection<Role> authUserRoles() {
+        return get().getUser().getRoles();
+    }
+
+    public static boolean authUserEnabled() {
+        return get().isEnabled();
     }
 }

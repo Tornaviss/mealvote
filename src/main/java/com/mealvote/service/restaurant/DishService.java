@@ -21,7 +21,6 @@ public class DishService {
 
     private final CrudMenuRepository menuRepository;
 
-
     @Autowired
     public DishService(CrudDishRepository repository, CrudMenuRepository menuRepository) {
         this.repository = repository;
@@ -55,9 +54,9 @@ public class DishService {
     @Transactional
     public void update(Dish dish) {
         Assert.notNull(dish, "dish must not be null");
-        if (!repository.existsById(dish.getId())) {
-            throw new NotFoundException("id = " + dish.getId());
-        }
-        repository.save(dish);
+        Dish persisted = repository.findById(dish.getId())
+                .orElseThrow(() -> new NotFoundException("id = " + dish.getId()));
+        persisted.setName(dish.getName());
+        persisted.setPrice(dish.getPrice());
     }
 }

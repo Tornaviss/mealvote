@@ -112,14 +112,6 @@ public class User extends AbstractNamedEntity {
         return roles;
     }
 
-//    public Choice getChoice() {
-//        return choice;
-//    }
-//
-//    public void setChoice(Choice choice) {
-//        this.choice = choice;
-//    }
-
     @Override
     public String toString() {
         return "User{" +

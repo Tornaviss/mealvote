@@ -13,10 +13,11 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
-import org.springframework.util.StringUtils;
 
 import java.util.List;
 
+import static com.mealvote.util.UserUtil.prepareToSave;
+import static com.mealvote.util.UserUtil.updateState;
 import static com.mealvote.util.ValidationUtil.checkNotFound;
 import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 
@@ -61,10 +62,9 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void update(User user) {
         Assert.notNull(user, "user must not be null");
-        if (!repository.existsById(user.getId())) {
-            throw new NotFoundException("id = " + user.getId());
-        }
-        repository.save(prepareToSave(user, passwordEncoder));
+        User persisted = repository.findById(user.getId()).orElseThrow(() -> new NotFoundException("id = " + user.getId()));
+        User prepared = prepareToSave(user, passwordEncoder);
+        updateState(persisted, prepared);
     }
 
     @Transactional
@@ -80,12 +80,5 @@ public class UserService implements UserDetailsService {
             throw new UsernameNotFoundException("User " + email + " is not found");
         }
         return new AuthorizedUser(user);
-    }
-
-    private static User prepareToSave(User user, PasswordEncoder passwordEncoder) {
-        String password = user.getPassword();
-        user.setPassword(StringUtils.hasText(password) ? passwordEncoder.encode(password) : password);
-        user.setEmail(user.getEmail().toLowerCase());
-        return user;
     }
 }

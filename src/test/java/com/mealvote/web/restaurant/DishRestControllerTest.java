@@ -87,7 +87,6 @@ class DishRestControllerTest extends AbstractRestControllerTest {
                 .andExpect(status().isNoContent())
                 .andDo(print());
 
-        System.out.println(service.get(VEGANO_DISH1_ID).getMenu());
         assertMatch(service.getAllForMenu(VEGANO_ID),
                 asSortedList(DISH_COMPARATOR, updated, VEGANO_DISH2), DISH_IGNORED_FIELDS);
     }

@@ -7,6 +7,7 @@ import com.mealvote.util.exception.IllegalRequestDataException;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -65,22 +66,15 @@ class MenuServiceTest {
 
     @Test
     void createRestaurantNotExist() {
-        assertThrows(NotFoundException.class, () ->
+        assertThrows(DataIntegrityViolationException.class, () ->
                 service.create(MenuTestData.getCreated(), 1)
         );
     }
 
     @Test
     void createAlreadyExist() {
-        assertThrows(IllegalOperationException.class, () ->
+        assertThrows(DataIntegrityViolationException.class, () ->
                 service.create(getCreated(), DOMINOS_ID)
-        );
-    }
-
-    @Test
-    void createNotNew() {
-        assertThrows(IllegalRequestDataException.class, () ->
-                service.create(getUpdated(), VEGANO_ID)
         );
     }
 
@@ -90,10 +84,7 @@ class MenuServiceTest {
         service.update(updated, VEGANO_ID);
         Menu actual = service.get(VEGANO_ID);
         assertMatch(actual, updated, MENU_IGNORED_FIELDS);
-
-        String[] dishIgnoredFieldsWithId = Arrays.copyOf(DISH_IGNORED_FIELDS, DISH_IGNORED_FIELDS.length + 1);
-        dishIgnoredFieldsWithId[DISH_IGNORED_FIELDS.length] = "id";
-        assertMatch(dishService.getAllForMenu(VEGANO_ID), updated.getDishes(), dishIgnoredFieldsWithId);
+        assertMatch(dishService.getAllForMenu(VEGANO_ID), updated.getDishes(), DISH_IGNORED_FIELDS);
     }
 
     @Test
@@ -105,7 +96,7 @@ class MenuServiceTest {
 
     @Test
     void updateNew() {
-        assertThrows(IllegalRequestDataException.class, () ->
+        assertThrows(NotFoundException.class, () ->
                 service.update(getUpdated(), MAFIA_ID)
         );
     }
@@ -114,14 +105,14 @@ class MenuServiceTest {
     void updateNotExist() {
         Menu updated = getUpdated();
         updated.setId(MAFIA_ID);
-        assertThrows(IllegalOperationException.class, () ->
+        assertThrows(NotFoundException.class, () ->
                 service.update(updated, MAFIA_ID)
         );
     }
 
     @Test
     void updateRestaurantNotExist() {
-        assertThrows(IllegalRequestDataException.class, () ->
+        assertThrows(NotFoundException.class, () ->
                 service.update(getUpdated(), 1)
         );
     }

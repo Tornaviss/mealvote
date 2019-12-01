@@ -14,9 +14,9 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 
-import static com.mealvote.web.SecurityUtil.authUserId;
 import static com.mealvote.util.ValidationUtil.assureIdConsistent;
 import static com.mealvote.util.ValidationUtil.checkNew;
+import static com.mealvote.web.SecurityUtil.*;
 import static com.mealvote.web.user.ProfileRestController.REST_URL;
 
 @RestController
@@ -58,6 +58,8 @@ public class ProfileRestController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody User user) {
         assureIdConsistent(user, authUserId());
+        user.setRoles(authUserRoles());
+        user.setEnabled(authUserEnabled());
         service.update(user);
     }
 

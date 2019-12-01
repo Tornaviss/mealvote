@@ -37,7 +37,11 @@ public class ExceptionInfoHandler {
     private static final Map<String, String> CONSTRAINS_MAP = Map.of(
             "users_unique_email_idx", "user with this email already exists",
             "dish_name_menu_unique_idx", "dish with this name already contains in the menu",
-            "constraint_index_b", "restaurant with this name is already exists"
+            "constraint_index_b", "restaurant with this name already exists",
+            "restaurant_unique_idx_index_4", "menu for this restaurant already exists",
+            "constraint_45", "restaurant for this menu does not exist",
+            "constraint_e", "user for this choice does not exist",
+            "constraint_e0", "restaurant for this choice does not exist"
     );
 
     @ResponseStatus(value = HttpStatus.CONFLICT)  // 409

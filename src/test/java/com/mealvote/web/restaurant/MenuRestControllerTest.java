@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -19,6 +21,8 @@ import static com.mealvote.JsonParseUtils.readFromJson;
 import static com.mealvote.MenuTestData.*;
 import static com.mealvote.RestaurantTestData.MAFIA_ID;
 import static com.mealvote.RestaurantTestData.VEGANO_ID;
+import static com.mealvote.RestaurantTestData.DOMINOS_ID;
+import static com.mealvote.RestaurantTestData.DOMINOS;
 import static com.mealvote.UserTestData.ADMIN;
 import static com.mealvote.UserTestData.USER;
 import static com.mealvote.UserTestData.userHttpBasic;
@@ -66,7 +70,6 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
                 .andExpect(status().isNoContent());
 
         assertMatch(service.get(VEGANO_ID), updated, MENU_IGNORED_FIELDS);
-
         String[] dishIgnoredFieldsWithId = Arrays.copyOf(DISH_IGNORED_FIELDS, DISH_IGNORED_FIELDS.length + 1);
         dishIgnoredFieldsWithId[DISH_IGNORED_FIELDS.length] = "id";
         assertMatch(dishService.getAllForMenu(VEGANO_ID), updated.getDishes(), dishIgnoredFieldsWithId);
@@ -87,5 +90,32 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
         assertMatch(returned, created, MENU_IGNORED_FIELDS);
         assertMatch(service.getAll(),
                 asSortedList(MENU_COMPARATOR, returned, DOMINOS_MENU, VEGANO_MENU), MENU_IGNORED_FIELDS);
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void createAlreadyExist() throws Exception {
+        Menu created = getCreated();
+        created.setRestaurant(DOMINOS);
+
+        mockMvc.perform(post(String.format("/restaurants/%d/menu", DOMINOS_ID))
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created)))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void createRestaurantNotExist() throws Exception {
+        Menu created = getCreated();
+
+        mockMvc.perform(post(String.format("/restaurants/%d/menu", 1))
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created)))
+                .andDo(print())
+                .andExpect(status().isConflict());
     }
 }
