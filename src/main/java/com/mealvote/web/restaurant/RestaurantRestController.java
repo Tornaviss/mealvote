@@ -33,9 +33,11 @@ public class RestaurantRestController {
     }
 
     @GetMapping("/{id}")
-    public Restaurant get(@PathVariable int id) {
-        LOGG.info("get {}", id);
-        return service.get(id);
+    public Restaurant get(
+            @PathVariable int id,
+            @RequestParam(value = "includeChoices", required = false, defaultValue = "false") boolean includeChoices) {
+        LOGG.info("get {} " + (includeChoices ? "including" : "not including") + " choices", id);
+        return includeChoices ? eraseParentLinks(service.getWithChoices(id)) : service.get(id);
     }
 
     @DeleteMapping("/{id}")
@@ -68,4 +70,8 @@ public class RestaurantRestController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
+    private static Restaurant eraseParentLinks(Restaurant restaurant) {
+        restaurant.getChoices().forEach(choice -> choice.setRestaurant(null));
+        return restaurant;
+    }
 }

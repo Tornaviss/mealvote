@@ -1,5 +1,6 @@
 package com.mealvote.web.restaurant;
 
+import com.mealvote.ChoiceTestData;
 import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.web.AbstractRestControllerTest;
@@ -9,8 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Collections;
 
 import static com.mealvote.AssertionUtils.*;
+import static com.mealvote.ChoiceTestData.USER_CHOICE;
 import static com.mealvote.JsonParseUtils.readFromJson;
 import static com.mealvote.RestaurantTestData.*;
 import static com.mealvote.UserTestData.ADMIN;
@@ -83,7 +89,7 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     void create() throws Exception {
         Restaurant created = getCreated();
 
-        ResultActions action =  mockMvc.perform(post(REST_URL)
+        ResultActions action = mockMvc.perform(post(REST_URL)
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -104,5 +110,31 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
                 .andExpect(status().isUnauthorized());
+    }
+
+    @Test
+    void createForbidden() throws Exception {
+        Restaurant created = getCreated();
+        mockMvc.perform(post(REST_URL)
+                .with(userHttpBasic(USER))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created)))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void getWithChoices() throws Exception {
+        ResultActions action = mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + DOMINOS_ID)
+                .param("includeChoices", "true")
+                .with(userHttpBasic(USER)))
+                .andExpect(status().isOk())
+                .andDo(print())
+                .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
+                .andExpect(contentJson(DOMINOS, Restaurant.class, IGNORED_FIELDS));
+
+        Restaurant returned = readFromJson(action, Restaurant.class);
+
+        assertMatch(returned.getChoices(), Collections.singletonList(USER_CHOICE), ChoiceTestData.IGNORED_FIELDS);
     }
 }

@@ -1,6 +1,7 @@
 package com.mealvote.service.restaurant;
 
 import com.mealvote.model.restaurant.Restaurant;
+import com.mealvote.model.user.Choice;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,14 +41,17 @@ public class RestaurantService {
     @Transactional
     public void update(Restaurant restaurant, int id) {
         Assert.notNull(restaurant, "restaurant must not be null");
-        if (!repository.existsById(id)) {
-            throw new NotFoundException("id = " + id);
-        }
-        repository.save(restaurant);
+        Restaurant persisted = repository.findById(id)
+                .orElseThrow(() -> new NotFoundException("id = " + id));
+        persisted.setName(restaurant.getName());
     }
 
     @Transactional
     public void delete(int id) {
         checkNotFoundWithId(repository.delete(id) != 0, id);
+    }
+
+    public Restaurant getWithChoices(int id) {
+        return repository.getWithChoices(id);
     }
 }

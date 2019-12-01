@@ -1,5 +1,6 @@
 package com.mealvote.service.restaurant;
 
+import com.mealvote.ChoiceTestData;
 import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
@@ -8,8 +9,11 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
+import java.util.Collections;
+
 import static com.mealvote.AssertionUtils.asSortedList;
 import static com.mealvote.AssertionUtils.assertMatch;
+import static com.mealvote.ChoiceTestData.USER_CHOICE;
 import static com.mealvote.RestaurantTestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -62,6 +66,12 @@ class RestaurantServiceTest {
         Restaurant updated = getUpdated();
         updated.setId(1);
         assertThrows(NotFoundException.class, () -> service.update(updated, updated.getId()));
+    }
+
+    @Test
+    void getWithChoices() {
+        Restaurant actual = service.getWithChoices(DOMINOS_ID);
+        assertMatch(actual.getChoices(), Collections.singletonList(USER_CHOICE), ChoiceTestData.IGNORED_FIELDS);
     }
 
 }

@@ -2,6 +2,7 @@ package com.mealvote.model.user;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.util.DateTimeUtil;
@@ -10,6 +11,7 @@ import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
+@Access(AccessType.FIELD)
 @Table(name = "user_choices")
 public class Choice {
 
@@ -18,15 +20,16 @@ public class Choice {
 
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
-    @JoinColumn(name = "user_id", nullable = false, updatable = false)
+    @JoinColumn(name = "user_id", nullable = false, updatable = false, unique = true)
     @JsonIgnore
     private User user;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "restaurant_id", nullable = false)
+    @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Restaurant restaurant;
 
-    @Column(name = "date_time")
+    @Column(name = "date_time", nullable = false, columnDefinition = "timestamp(0) default now()")
     @JsonFormat(pattern = DateTimeUtil.DATE_TIME_PATTERN)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateTime = LocalDateTime.now();
@@ -78,7 +81,7 @@ public class Choice {
     public String toString() {
         return "Choice{" +
                 "userId=" + userId +
-                ", restaurant=" + restaurant +
+//                ", restaurant=" + restaurant +
                 ", dateTime=" + dateTime +
                 '}';
     }
