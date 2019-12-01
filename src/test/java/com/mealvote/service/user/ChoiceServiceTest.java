@@ -3,8 +3,11 @@ package com.mealvote.service.user;
 import com.mealvote.RestaurantTestData;
 import com.mealvote.model.user.Choice;
 import com.mealvote.util.exception.IllegalOperationException;
+import com.mealvote.util.exception.NotFoundException;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -45,16 +48,37 @@ class ChoiceServiceTest {
     }
 
     @Test
-    void update() {
-        if (LocalTime.now().compareTo(LocalTime.of(11, 0)) < 0) {
-            service.update(VEGANO_ID, USER_ID);
-            Choice actual = service.get(USER_ID);
-            assertTrue(USER_CHOICE.getDateTime().compareTo(actual.getDateTime()) < 0);
-            assertMatch(service.get(USER_ID).getRestaurant(), VEGANO, RestaurantTestData.IGNORED_FIELDS);
-        } else {
-            assertThrows(IllegalOperationException.class, () ->
-                    service.update(VEGANO_ID, USER_ID)
-            );
-        }
+    void createUserNotExist() {
+        Assertions.assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(VEGANO_ID, 1));
     }
+
+    @Test
+    void createRestaurantNotExist() {
+        Assertions.assertThrows(NotFoundException.class,
+                () -> service.create(1, ADMIN_ID));
+    }
+
+    @Test
+    void update() {
+        service.update(VEGANO_ID, USER_ID, LocalTime.MAX);
+        Choice actual = service.get(USER_ID);
+        assertTrue(USER_CHOICE.getDateTime().compareTo(actual.getDateTime()) < 0);
+        assertMatch(service.get(USER_ID).getRestaurant(), VEGANO, RestaurantTestData.IGNORED_FIELDS);
+    }
+
+    @Test
+    void updateTooLate() {
+        assertThrows(IllegalOperationException.class, () ->
+                service.update(VEGANO_ID, USER_ID, LocalTime.MIN)
+        );
+    }
+
+    @Test
+    void updateRestaurantNotExist() {
+        assertThrows(DataIntegrityViolationException.class, () ->
+                service.update(1, USER_ID, LocalTime.MAX));
+    }
+
+
 }

@@ -3,10 +3,12 @@ package com.mealvote.web.user;
 import com.mealvote.RestaurantTestData;
 import com.mealvote.model.user.Choice;
 import com.mealvote.service.user.ChoiceService;
+import com.mealvote.util.DateTimeUtil;
 import com.mealvote.web.AbstractRestControllerTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -15,6 +17,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 import static com.mealvote.AssertionUtils.assertMatch;
 import static com.mealvote.AssertionUtils.contentJson;
@@ -51,19 +54,28 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Test
     @Transactional
     void update() throws Exception {
-        ResultActions action = mockMvc.perform(
-                put(REST_URL + "/" + VEGANO_ID)
-                .with(userHttpBasic(USER)));
-
-        if (LocalTime.now().compareTo(LocalTime.of(11, 0)) < 0) {
-           action.andExpect(status().isNoContent());
-            Choice updated = service.get(USER_ID);
-            Assertions.assertEquals(VEGANO_ID, updated.getRestaurant().getId());
-            Assertions.assertEquals(VEGANO.getName(), updated.getRestaurant().getName());
-        } else {
-            action.andExpect(status().isConflict());
-        }
+        mockMvc.perform(
+                put(REST_URL + "/" + VEGANO_ID + "/"
+                        + LocalTime.MAX.format(DateTimeFormatter.ofPattern(DateTimeUtil.TIME_PATTERN)))
+                        .with(userHttpBasic(USER)))
+                .andDo(print())
+                .andExpect(status().isNoContent());
+        Choice updated = service.get(USER_ID);
+        Assertions.assertEquals(VEGANO_ID, updated.getRestaurant().getId());
+        Assertions.assertEquals(VEGANO.getName(), updated.getRestaurant().getName());
     }
+
+    @Test
+    @Transactional
+    void updateTooLate() throws Exception {
+        ResultActions action = mockMvc.perform(
+                put(REST_URL + "/" + VEGANO_ID + "/"
+                        + LocalTime.MIN.format(DateTimeFormatter.ofPattern(DateTimeUtil.TIME_PATTERN)))
+                        .with(userHttpBasic(USER)))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
 
     @Test
     void create() throws Exception {

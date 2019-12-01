@@ -11,8 +11,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
+import static com.mealvote.util.DateTimeUtil.DEADLINE;
 import static com.mealvote.util.DateTimeUtil.isTimeToChangeMind;
 import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 
@@ -44,29 +46,24 @@ public class ChoiceService {
 
     @Transactional
     public Choice create(int restaurantId, int userId) {
-        if (!repository.existsById(userId)) {
-            Choice choice = new Choice(
-                    userRepository.getOne(userId),
-                    restaurantRepository.findById(restaurantId).orElseThrow(() -> new NotFoundException("id = " + restaurantId))
-            );
-            return repository.save(choice);
-
-        } else {
-            throw new IllegalOperationException("choice for user " + userId + " is already exist. " +
-                    "Only one choice per user allowed");
-        }
+        Choice choice = new Choice(
+                userRepository.getOne(userId),
+                restaurantRepository.findById(restaurantId).orElseThrow(() -> new NotFoundException("id = " + restaurantId))
+        );
+        return repository.save(choice);
     }
 
     @Transactional
     public void update(int restaurantId, int userId) {
+        update(restaurantId, userId, DEADLINE);
+    }
+
+    @Transactional
+    public void update(int restaurantId, int userId, LocalTime deadline) {
         Choice choice = checkNotFoundWithId(repository.findById(userId).orElse(null), userId);
-        if (isTimeToChangeMind(choice.getDateTime())) {
-            if (restaurantRepository.existsById(restaurantId)) {
-                choice.setRestaurant(restaurantRepository.getOne(restaurantId));
-                choice.setDateTime(LocalDateTime.now());
-            } else {
-                throw new NotFoundException("id = " + restaurantId);
-            }
+        if (isTimeToChangeMind(choice.getDateTime(), deadline)) {
+            choice.setRestaurant(restaurantRepository.getOne(restaurantId));
+            choice.setDateTime(LocalDateTime.now());
         } else {
             throw new IllegalOperationException("choice for user " + userId + " cannot be changed now");
         }
