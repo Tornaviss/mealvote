@@ -26,7 +26,7 @@ CREATE UNIQUE INDEX users_unique_email_idx ON users (email);
 CREATE TABLE user_roles
 (
     user_id INTEGER NOT NULL,
-    role    VARCHAR,
+    role    VARCHAR NOT NULL,
     CONSTRAINT user_roles_idx UNIQUE (user_id, role),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE
 );
@@ -39,9 +39,9 @@ CREATE TABLE restaurants
 
 CREATE TABLE user_choices
 (
-    user_id       INTEGER NOT NULL,
-    restaurant_id INTEGER NOT NULL,
-    date_time     TIMESTAMP(0) DEFAULT now(),
+    user_id       INTEGER                    NOT NULL,
+    restaurant_id INTEGER                    NOT NULL,
+    date_time     TIMESTAMP(0) DEFAULT now() NOT NULL,
     CONSTRAINT user_id_idx UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE
@@ -67,15 +67,15 @@ CREATE TABLE dishes
 
 CREATE TABLE dishes_history
 (
-    history_id INTEGER DEFAULT history_seq.nextval PRIMARY KEY,
-    id         INTEGER              NOT NULL,
-    menu_id    INTEGER              NOT NULL,
-    name       VARCHAR              NOT NULL,
-    price      INTEGER              NOT NULL,
-    username   VARCHAR              NOT NULL,
-    action     VARCHAR              NOT NULL,
-    action_timestamp  TIMESTAMP            NOT NULL,
-    active     BOOLEAN DEFAULT TRUE NOT NULL
+    history_id       INTEGER DEFAULT history_seq.nextval PRIMARY KEY,
+    id               INTEGER              NOT NULL,
+    menu_id          INTEGER              NOT NULL,
+    name             VARCHAR              NOT NULL,
+    price            INTEGER              NOT NULL,
+    username         VARCHAR              NOT NULL,
+    action           VARCHAR              NOT NULL,
+    action_timestamp TIMESTAMP            NOT NULL,
+    active           BOOLEAN DEFAULT TRUE NOT NULL
 );
 
 CREATE TRIGGER dishes_update_audit_trail
