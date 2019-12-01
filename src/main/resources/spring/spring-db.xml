@@ -23,8 +23,6 @@
           class="org.springframework.jdbc.datasource.DriverManagerDataSource">
         <property name="driverClassName" value="${database.driverClassName}" />
         <property name="url" value="${database.url}" />
-<!--        <property name="username" value="${database.username}"/>-->
-<!--        <property name="password" value="${database.password}"/>-->
     </bean>
 
     <bean id="entityManagerFactory" class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean"
@@ -36,6 +34,11 @@
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).FORMAT_SQL}" value="${hibernate.format_sql}" />
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).USE_SQL_COMMENTS}" value="${hibernate.use_sql_comments}" />
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).JPA_PROXY_COMPLIANCE}" value="false" />
+                <entry key="#{T(org.hibernate.cfg.AvailableSettings).STATEMENT_BATCH_SIZE}" value="5" />
+                <entry key="#{T(org.hibernate.cfg.AvailableSettings).ORDER_UPDATES}" value="true" />
+                <entry key="#{T(org.hibernate.cfg.AvailableSettings).ORDER_INSERTS}" value="true" />
+<!--                <entry key="#{T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS}" value="true" />-->
+
             </map>
         </property>
 
@@ -48,7 +51,6 @@
 
     <tx:annotation-driven/>
 
-    <!-- Transaction manager for a single JPA EntityManagerFactory (alternative to JTA) -->
     <bean id="transactionManager" class="org.springframework.orm.jpa.JpaTransactionManager"
           p:entityManagerFactory-ref="entityManagerFactory" />
 
