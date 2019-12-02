@@ -1,23 +1,17 @@
 package com.mealvote;
 
-import com.mealvote.model.user.Choice;
 import com.mealvote.model.user.Role;
 import com.mealvote.model.user.User;
 import com.mealvote.web.json.JsonUtil;
 import org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
-import java.time.LocalDateTime;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.List;
 
-import static com.mealvote.RestaurantTestData.DOMINOS;
 import static com.mealvote.model.AbstractBaseEntity.START_SEQ;
-import static org.assertj.core.api.Assertions.assertThat;
 
 public class UserTestData {
+
     public static final String[] IGNORED_FIELDS = {"registered", "roles", "password"};
     public static final Comparator<User> USER_COMPARATOR = Comparator.comparing(User::getName).thenComparing(User::getEmail);
 
@@ -41,5 +35,20 @@ public class UserTestData {
 
     public static RequestPostProcessor userHttpBasic(User user) {
         return SecurityMockMvcRequestPostProcessors.httpBasic(user.getEmail(), user.getPassword());
+    }
+
+    public enum InvalidUserProperty {
+        SHORT_PASSWORD("111"), SHORT_NAME("a"), MALFORMED_EMAIL("invalid@");
+
+        private final String value;
+
+        InvalidUserProperty(String value) {
+            this.value = value;
+        }
+
+        @Override
+        public String toString() {
+            return this.value;
+        }
     }
 }

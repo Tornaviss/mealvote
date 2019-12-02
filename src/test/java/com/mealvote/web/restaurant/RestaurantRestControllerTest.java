@@ -38,15 +38,16 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     void get() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + DOMINOS_ID)
                 .with(userHttpBasic(USER)))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(contentJson(DOMINOS, Restaurant.class, IGNORED_FIELDS));
     }
 
     @Test
-    void getNotAuth() throws Exception {
+    void getUnauthorized() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + DOMINOS_ID))
+                .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
@@ -54,35 +55,102 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     void getAll() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL)
                 .with(userHttpBasic(USER)))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(contentJson(
                         asSortedList(COMPARATOR, DOMINOS, MAFIA, VEGANO), Restaurant.class, IGNORED_FIELDS));
     }
 
     @Test
+    void getAllUnauthorized() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
+    }
+
+    @Test
     void delete() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete(REST_URL + "/" + DOMINOS_ID)
                 .with(userHttpBasic(ADMIN)))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isNoContent());
 
         assertMatch(repository.getAll(), asSortedList(COMPARATOR, MAFIA, VEGANO), IGNORED_FIELDS);
+    }
+
+    @Test
+    void deleteForbidden() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(REST_URL + "/" + DOMINOS_ID)
+                .with(userHttpBasic(USER)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
     @Test
     void update() throws Exception {
         Restaurant updated = getUpdated();
 
-        mockMvc.perform(put(REST_URL + "/" + VEGANO_ID)
+        mockMvc.perform(put(REST_URL + "/" + updated.getId())
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(updated)))
-                .andExpect(status().isNoContent())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isNoContent());
 
         assertMatch(repository.getAll(), asSortedList(COMPARATOR, updated, DOMINOS, MAFIA), IGNORED_FIELDS);
+    }
+
+    @Test
+    void updateNotFound() throws Exception {
+        Restaurant updated = getUpdated();
+        updated.setId(1);
+
+        mockMvc.perform(put(REST_URL + "/" + updated.getId())
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void updateNameNotValid() throws Exception {
+        Restaurant updated = getUpdated();
+        updated.setName("a");
+
+        mockMvc.perform(put(REST_URL + "/" + updated.getId())
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void updateNameDuplicate() throws Exception {
+        Restaurant updated = getUpdated();
+        updated.setName(DOMINOS.getName());
+
+        mockMvc.perform(put(REST_URL + "/" + updated.getId())
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated)))
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void updateForbidden() throws Exception {
+        Restaurant updated = getUpdated();
+
+        mockMvc.perform(put(REST_URL + "/" + updated.getId())
+                .with(userHttpBasic(USER))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(updated)))
+                .andDo(print())
+                .andExpect(status().isForbidden());
     }
 
     @Test
@@ -93,8 +161,8 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
-                .andExpect(status().isCreated())
-                .andDo(print());
+                .andDo(print())
+                .andExpect(status().isCreated());
 
         Restaurant returned = readFromJson(action, Restaurant.class);
         created.setId(returned.getId());
@@ -104,12 +172,30 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createNotAuth() throws Exception {
+    @Transactional(propagation = Propagation.NEVER)
+    void createNameDuplicate() throws Exception {
         Restaurant created = getCreated();
+        created.setName(DOMINOS.getName());
+
         mockMvc.perform(post(REST_URL)
+                .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
-                .andExpect(status().isUnauthorized());
+                .andDo(print())
+                .andExpect(status().isConflict());
+    }
+
+    @Test
+    void createNameNotValid() throws Exception {
+        Restaurant created = getCreated();
+        created.setName("a");
+
+        mockMvc.perform(post(REST_URL)
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created)))
+                .andDo(print())
+                .andExpect(status().isUnprocessableEntity());
     }
 
     @Test
@@ -119,22 +205,38 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
                 .with(userHttpBasic(USER))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
+                .andDo(print())
                 .andExpect(status().isForbidden());
     }
 
     @Test
-    @Transactional(propagation = Propagation.NEVER)
     void getWithChoices() throws Exception {
         ResultActions action = mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + DOMINOS_ID)
                 .param("includeChoices", "true")
                 .with(userHttpBasic(USER)))
-                .andExpect(status().isOk())
                 .andDo(print())
+                .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON_VALUE))
                 .andExpect(contentJson(DOMINOS, Restaurant.class, IGNORED_FIELDS));
 
         Restaurant returned = readFromJson(action, Restaurant.class);
-
         assertMatch(returned.getChoices(), Collections.singletonList(USER_CHOICE), ChoiceTestData.IGNORED_FIELDS);
+    }
+
+    @Test
+    void getWithChoicesNotFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + 1)
+                .param("includeChoices", "true")
+                .with(userHttpBasic(USER)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void getWithChoicesUnauthorised() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + 1)
+                .param("includeChoices", "true"))
+                .andDo(print())
+                .andExpect(status().isUnauthorized());
     }
 }

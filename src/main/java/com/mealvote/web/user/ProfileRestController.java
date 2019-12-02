@@ -44,7 +44,7 @@ public class ProfileRestController {
 
     @PostMapping(value = "/register", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
-    public ResponseEntity<User> register(@RequestBody User user) {
+    public ResponseEntity<User> register(@Valid @RequestBody User user) {
         checkNew(user);
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         User created = service.create(user);

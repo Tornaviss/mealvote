@@ -52,6 +52,6 @@ public class RestaurantService {
     }
 
     public Restaurant getWithChoices(int id) {
-        return repository.getWithChoices(id);
+        return checkNotFoundWithId(repository.getWithChoices(id), id);
     }
 }

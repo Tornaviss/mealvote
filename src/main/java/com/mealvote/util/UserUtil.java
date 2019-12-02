@@ -17,22 +17,24 @@ public class UserUtil {
         return user;
     }
 
-    public static void updateState(User existing, User updated) {
-        existing.setName(updated.getName());
-        existing.setEmail(updated.getEmail());
-        existing.setPassword(updated.getPassword());
-        existing.setEnabled(updated.isEnabled());
-        Set<Role> existingRoles = existing.getRoles();
-        Set<Role> updatedRoles = updated.getRoles();
+    public static void updateState(User existing, User prepared) {
+        existing.setName(prepared.getName());
+        existing.setEmail(prepared.getEmail());
+        existing.setPassword(prepared.getPassword());
+        existing.setEnabled(prepared.isEnabled());
+        updateExistingRoles(existing.getRoles(), prepared.getRoles());
+    }
 
+    private static void updateExistingRoles(Set<Role> existing, Set<Role> updated) {
         Set<Role> toRemove = new HashSet<>();
-        existingRoles.stream()
-                .filter(role -> !updatedRoles.contains(role))
-                .forEach(toRemove::add);
-        existingRoles.removeAll(toRemove);
 
-        updatedRoles.stream()
-                .filter(role -> !existingRoles.contains(role))
-                .forEach(existingRoles::add);
+        existing.stream()
+                .filter(role -> !updated.contains(role))
+                .forEach(toRemove::add);
+        existing.removeAll(toRemove);
+
+        updated.stream()
+                .filter(role -> !existing.contains(role))
+                .forEach(existing::add);
     }
 }

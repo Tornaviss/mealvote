@@ -40,6 +40,12 @@ class ChoiceServiceTest {
     }
 
     @Test
+    void getNotExist() {
+        assertThrows(NotFoundException.class,
+                () -> service.get(ADMIN_ID));
+    }
+
+    @Test
     void create() {
         Choice created = service.create(VEGANO_ID, ADMIN_ID);
         Choice actual = service.get(ADMIN_ID);
@@ -49,14 +55,20 @@ class ChoiceServiceTest {
 
     @Test
     void createUserNotExist() {
-        Assertions.assertThrows(DataIntegrityViolationException.class,
+        assertThrows(DataIntegrityViolationException.class,
                 () -> service.create(VEGANO_ID, 1));
     }
 
     @Test
     void createRestaurantNotExist() {
-        Assertions.assertThrows(NotFoundException.class,
+        assertThrows(NotFoundException.class,
                 () -> service.create(1, ADMIN_ID));
+    }
+
+    @Test
+    void createAlreadyExist() {
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(VEGANO_ID, USER_ID));
     }
 
     @Test
@@ -80,5 +92,10 @@ class ChoiceServiceTest {
                 service.update(1, USER_ID, LocalTime.MAX));
     }
 
+    @Test
+    void updateUserNotFound() {
+        assertThrows(NotFoundException.class, () ->
+                service.update(VEGANO_ID, 1, LocalTime.MAX));
+    }
 
 }

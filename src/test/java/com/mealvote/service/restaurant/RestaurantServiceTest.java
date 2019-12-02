@@ -5,6 +5,7 @@ import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
@@ -38,6 +39,12 @@ class RestaurantServiceTest {
     }
 
     @Test
+    void getNotFound() {
+        assertThrows(NotFoundException.class,
+                () -> service.get(1));
+    }
+
+    @Test
     void create() {
         Restaurant newRestaurant = getCreated();
         Restaurant created = service.create(newRestaurant);
@@ -48,10 +55,30 @@ class RestaurantServiceTest {
     }
 
     @Test
+    void createNull() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.create(null));
+    }
+
+    @Test
+    void createDuplicateName() {
+        Restaurant newRestaurant = getCreated();
+        newRestaurant.setName(DOMINOS.getName());
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(newRestaurant));
+    }
+
+    @Test
     void delete() {
         service.delete(DOMINOS_ID);
         assertMatch(service.getAll(), asSortedList(COMPARATOR, VEGANO, MAFIA), IGNORED_FIELDS);
         assertThrows(NotFoundException.class, () -> service.get(DOMINOS_ID));
+    }
+
+    @Test
+    void deleteNotFound() {
+        assertThrows(NotFoundException.class,
+                () -> service.delete(1));
     }
 
     @Test
@@ -62,10 +89,24 @@ class RestaurantServiceTest {
     }
 
     @Test
+    void updateNull() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.update(null, DOMINOS_ID));
+    }
+
+    @Test
     void updateNotFound(){
         Restaurant updated = getUpdated();
         updated.setId(1);
         assertThrows(NotFoundException.class, () -> service.update(updated, updated.getId()));
+    }
+
+    @Test
+    void updateNameDuplicate() {
+        Restaurant updated = getUpdated();
+        updated.setName(MAFIA.getName());
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.update(updated, updated.getId()));
     }
 
     @Test

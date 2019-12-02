@@ -1,6 +1,7 @@
 package com.mealvote.service.restaurant;
 
 import com.mealvote.MenuTestData;
+import com.mealvote.model.restaurant.Dish;
 import com.mealvote.model.restaurant.Menu;
 import com.mealvote.util.exception.IllegalOperationException;
 import com.mealvote.util.exception.IllegalRequestDataException;
@@ -14,6 +15,7 @@ import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.List;
 
 import static com.mealvote.AssertionUtils.asSortedList;
 import static com.mealvote.AssertionUtils.assertMatch;
@@ -65,6 +67,13 @@ class MenuServiceTest {
     }
 
     @Test
+    void createAlreadyExist() {
+        assertThrows(DataIntegrityViolationException.class, () ->
+                service.create(getCreated(), DOMINOS_ID)
+        );
+    }
+
+    @Test
     void createRestaurantNotExist() {
         assertThrows(DataIntegrityViolationException.class, () ->
                 service.create(MenuTestData.getCreated(), 1)
@@ -72,10 +81,12 @@ class MenuServiceTest {
     }
 
     @Test
-    void createAlreadyExist() {
-        assertThrows(DataIntegrityViolationException.class, () ->
-                service.create(getCreated(), DOMINOS_ID)
+    void createWithDishNameDuplicate() {
+        Menu newMenu = new Menu(
+                List.of(new Dish("duplicateName", 500), new Dish("duplicateName", 200))
         );
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(newMenu, MAFIA_ID));
     }
 
     @Test
@@ -102,7 +113,7 @@ class MenuServiceTest {
     }
 
     @Test
-    void updateNotExist() {
+    void updateNotFound() {
         Menu updated = getUpdated();
         updated.setId(MAFIA_ID);
         assertThrows(NotFoundException.class, () ->
@@ -111,10 +122,29 @@ class MenuServiceTest {
     }
 
     @Test
-    void updateRestaurantNotExist() {
+    void updateRestaurantNotFound() {
         assertThrows(NotFoundException.class, () ->
                 service.update(getUpdated(), 1)
         );
+    }
+
+    @Test
+    void updateWithDishNameDuplicate() {
+        Menu updated = getUpdated();
+        updated.setDishes(
+                List.of(new Dish("duplicateName", 500), new Dish("duplicateName", 200))
+        );
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.update(updated, VEGANO_ID));
+
+    }
+
+    @Test
+    void updateWithDishNotFound() {
+        Menu updated = getUpdated();
+        updated.getDishes().get(0).setId(1);
+        assertThrows(NotFoundException.class,
+                () -> service.update(updated, VEGANO_ID));
     }
 
     @Test

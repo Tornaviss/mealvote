@@ -4,9 +4,12 @@ import com.mealvote.model.restaurant.Dish;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
+
+import java.util.Collections;
 
 import static com.mealvote.AssertionUtils.asSortedList;
 import static com.mealvote.AssertionUtils.assertMatch;
@@ -31,6 +34,11 @@ class DishServiceTest {
     }
 
     @Test
+    void getNotFound() {
+        assertThrows(NotFoundException.class, () -> service.get(1));
+    }
+
+    @Test
     void getAll() {
         assertMatch(service.getAll(),
                 asSortedList(DISH_COMPARATOR, DOMINOS_DISH1, DOMINOS_DISH2, VEGANO_DISH1, VEGANO_DISH2),
@@ -46,9 +54,20 @@ class DishServiceTest {
     }
 
     @Test
+    void getAllForMenuNotExist() {
+        assertMatch(service.getAllForMenu(1), Collections.emptyList(), DISH_IGNORED_FIELDS);
+    }
+
+    @Test
     void delete() {
         service.delete(DOMINOS_DISH1_ID);
         assertMatch(service.getAllForMenu(DOMINOS_ID), asSortedList(DISH_COMPARATOR, DOMINOS_DISH2), DISH_IGNORED_FIELDS);
+    }
+
+    @Test
+    void deleteNotFound() {
+        assertThrows(NotFoundException.class,
+                () -> service.delete(1));
     }
 
     @Test
@@ -59,6 +78,27 @@ class DishServiceTest {
         assertMatch(created, newDish, DISH_IGNORED_FIELDS);
         assertMatch(service.getAllForMenu(DOMINOS_ID),
                 asSortedList(DISH_COMPARATOR, created, DOMINOS_DISH2, DOMINOS_DISH1), DISH_IGNORED_FIELDS);
+    }
+
+    @Test
+    void createMenuNotExist() {
+        Dish newDish = getCreatedDish();
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(newDish, 1));
+    }
+
+    @Test
+    void createNull() {
+        assertThrows(IllegalArgumentException.class,
+                () -> service.create(null, 1));
+    }
+
+    @Test
+    void createNameDuplicate() {
+        Dish newDish = getCreatedDish();
+        newDish.setName(DOMINOS_DISH1.getName());
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.create(newDish, DOMINOS_ID));
     }
 
     @Test
@@ -75,5 +115,17 @@ class DishServiceTest {
         Dish updated = getUpdatedDish();
         updated.setId(1);
         assertThrows(NotFoundException.class, () -> service.update(updated));
+    }
+
+    @Test
+    void updateNull() {
+        assertThrows(IllegalArgumentException.class, () -> service.update(null));
+    }
+    @Test
+    void updateNameDuplicate() {
+        Dish updated = getUpdatedDish();
+        updated.setName(VEGANO_DISH2.getName());
+        assertThrows(DataIntegrityViolationException.class,
+                () -> service.update(updated));
     }
 }
