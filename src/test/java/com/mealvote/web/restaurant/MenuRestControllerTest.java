@@ -223,7 +223,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
-    void createRestaurantNotExist() throws Exception {
+    void createRestaurantNotFound() throws Exception {
         Menu created = getCreated();
 
         mockMvc.perform(post(String.format("/restaurants/%d/menu", 1))
@@ -231,7 +231,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
                 .andDo(print())
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

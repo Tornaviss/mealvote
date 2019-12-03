@@ -27,7 +27,7 @@ public class MenuUtil {
             if (found) {
                 completionMap.remove(updated.getId());
             } else {
-                throw new NotFoundException("id = " + updated.getId());
+                throw new NotFoundException("Dish with id = " + updated.getId());
             }
         }
 

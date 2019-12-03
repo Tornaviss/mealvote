@@ -29,7 +29,7 @@ public class RestaurantService {
     }
 
     public Restaurant get(int id) {
-        return checkNotFoundWithId(repository.findById(id).orElse(null), id);
+        return checkNotFoundWithId(repository.findById(id).orElse(null), id, "restaurant");
     }
 
     @Transactional
@@ -48,10 +48,10 @@ public class RestaurantService {
 
     @Transactional
     public void delete(int id) {
-        checkNotFoundWithId(repository.delete(id) != 0, id);
+        checkNotFoundWithId(repository.delete(id) != 0, id, "restaurant");
     }
 
     public Restaurant getWithChoices(int id) {
-        return checkNotFoundWithId(repository.getWithChoices(id), id);
+        return checkNotFoundWithId(repository.getWithChoices(id), id, "restaurant");
     }
 }

@@ -28,7 +28,7 @@ public class DishService {
     }
 
     public Dish get(int id) {
-        return checkNotFoundWithId(repository.findById(id).orElse(null), id);
+        return checkNotFoundWithId(repository.findById(id).orElse(null), id, "dish");
     }
 
     public List<Dish> getAll() {
@@ -41,7 +41,7 @@ public class DishService {
 
     @Transactional
     public void delete(int id) {
-        checkNotFoundWithId(repository.delete(id) != 0, id);
+        checkNotFoundWithId(repository.delete(id) != 0, id, "dish");
     }
 
     @Transactional
@@ -54,8 +54,7 @@ public class DishService {
     @Transactional
     public void update(Dish dish) {
         Assert.notNull(dish, "dish must not be null");
-        Dish persisted = repository.findById(dish.getId())
-                .orElseThrow(() -> new NotFoundException("id = " + dish.getId()));
+        Dish persisted = get(dish.getId());
         persisted.setName(dish.getName());
         persisted.setPrice(dish.getPrice());
     }

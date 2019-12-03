@@ -52,7 +52,7 @@ public class ChoiceRestController {
      * @param restaurantId restaurant that user wants to choose
      * @param deadline time until user can change his mind
      * @throws IllegalOperationException if user's related Choice object dateTime value has another date than {@code LocalDate.now())
-     * or it's time is less that {@code LocalTime.now()} inclusive
+     *                                   or it's time is less that {@code LocalTime.now()} inclusive
      */
     @PutMapping("/{restaurantId}/{deadline}")
     @ResponseStatus(HttpStatus.NO_CONTENT)

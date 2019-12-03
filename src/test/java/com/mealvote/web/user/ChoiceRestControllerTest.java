@@ -93,12 +93,12 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
-    void updateRestaurantNotExist() throws Exception {
+    void updateRestaurantNotFound() throws Exception {
         mockMvc.perform(
                 put(REST_URL + "/" + 1 + "/" + MAX_TIME_FORMATTED)
                         .with(userHttpBasic(USER)))
                 .andDo(print())
-                .andExpect(status().isConflict());
+                .andExpect(status().isNotFound());
     }
 
     @Test

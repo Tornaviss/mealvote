@@ -43,16 +43,16 @@ public class UserService implements UserDetailsService {
 
     @Transactional
     public void delete(int id) {
-        checkNotFoundWithId(repository.delete(id) != 0, id);
+        checkNotFoundWithId(repository.delete(id) != 0, id, "user");
     }
 
     public User get(int id) {
-        return checkNotFoundWithId(repository.findById(id).orElse(null), id);
+        return checkNotFoundWithId(repository.findById(id).orElse(null), id, "user");
     }
 
     public User getByEmail(String email) {
         Assert.notNull(email, "email must not be null");
-        return checkNotFound(repository.getByEmail(email), "email=" + email);
+        return checkNotFound(repository.getByEmail(email), "email=" + email, "user");
     }
 
     public List<User> getAll() {
@@ -62,7 +62,7 @@ public class UserService implements UserDetailsService {
     @Transactional
     public void update(User user) {
         Assert.notNull(user, "user must not be null");
-        User persisted = repository.findById(user.getId()).orElseThrow(() -> new NotFoundException("id = " + user.getId()));
+        User persisted = get(user.getId());
         User prepared = prepareToSave(user, passwordEncoder);
         updateState(persisted, prepared);
     }
@@ -77,7 +77,7 @@ public class UserService implements UserDetailsService {
     public AuthorizedUser loadUserByUsername(String email) throws UsernameNotFoundException {
         User user = repository.getByEmail(email.toLowerCase());
         if (user == null) {
-            throw new UsernameNotFoundException("User " + email + " is not found");
+            throw new UsernameNotFoundException("user " + email + " is not found");
         }
         return new AuthorizedUser(user);
     }

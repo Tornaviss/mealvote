@@ -80,7 +80,7 @@ class UserServiceTest {
     @Test
     void getByEmailNotFound() {
         assertThrows(NotFoundException.class,
-                () -> service.getByEmail("notfound404@absent.gz"));;
+                () -> service.getByEmail("notfound404@absent.gz"));
     }
 
     @Test

@@ -226,6 +226,19 @@ class DishRestControllerTest extends AbstractRestControllerTest {
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
+    void createMenuNotFound() throws Exception {
+        Dish created = getCreatedDish();
+
+        mockMvc.perform(post("/menus/" + 1 + "/dishes")
+                .with(userHttpBasic(ADMIN))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(JsonUtil.writeValue(created)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
     void createNameDuplicate() throws Exception {
         Dish created = getCreatedDish();
         created.setName(VEGANO_DISH2.getName());

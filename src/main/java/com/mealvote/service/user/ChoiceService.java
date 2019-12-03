@@ -5,7 +5,6 @@ import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.repository.user.CrudChoiceRepository;
 import com.mealvote.repository.user.CrudUserRepository;
 import com.mealvote.util.exception.IllegalOperationException;
-import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,14 +40,14 @@ public class ChoiceService {
     }
 
     public Choice get(int userId) {
-        return checkNotFoundWithId(repository.findById(userId).orElse(null), userId);
+        return checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "choice");
     }
 
     @Transactional
     public Choice create(int restaurantId, int userId) {
         Choice choice = new Choice(
                 userRepository.getOne(userId),
-                restaurantRepository.findById(restaurantId).orElseThrow(() -> new NotFoundException("id = " + restaurantId))
+                checkNotFoundWithId(restaurantRepository.findById(restaurantId).orElse(null), restaurantId, "restaurant")
         );
         return repository.save(choice);
     }
@@ -60,7 +59,7 @@ public class ChoiceService {
 
     @Transactional
     public void update(int restaurantId, int userId, LocalTime deadline) {
-        Choice choice = checkNotFoundWithId(repository.findById(userId).orElse(null), userId);
+        Choice choice = checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "choice");
         if (isTimeToChangeMind(choice.getDateTime(), deadline)) {
             choice.setRestaurant(restaurantRepository.getOne(restaurantId));
             choice.setDateTime(LocalDateTime.now());

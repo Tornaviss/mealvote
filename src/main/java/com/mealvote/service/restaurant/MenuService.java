@@ -3,7 +3,6 @@ package com.mealvote.service.restaurant;
 import com.mealvote.model.restaurant.Menu;
 import com.mealvote.repository.restaurant.CrudMenuRepository;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
-import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,7 +28,7 @@ public class MenuService {
     }
 
     public Menu get(int restaurantId) {
-        return checkNotFoundWithId(repository.findById(restaurantId).orElse(null), restaurantId);
+        return checkNotFoundWithId(repository.findById(restaurantId).orElse(null), restaurantId, "menu");
     }
 
     public List<Menu> getAll() {
@@ -47,14 +46,13 @@ public class MenuService {
     @Transactional
     public void update(Menu menu, int restaurantId) {
         Assert.notNull(menu, "menu must not be null");
-        Menu persisted = repository.findById(restaurantId)
-                .orElseThrow(() -> new NotFoundException("id = " + restaurantId));
+        Menu persisted = get(restaurantId);
         refreshDishes(persisted, menu.getDishes());
     }
 
     @Transactional
     public void delete(int id) {
-        checkNotFoundWithId(repository.delete(id) != 0, id);
+        checkNotFoundWithId(repository.delete(id) != 0, id, "menu");
     }
 
 
