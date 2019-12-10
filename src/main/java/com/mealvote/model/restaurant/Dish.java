@@ -14,7 +14,7 @@ import java.time.LocalDateTime;
 public class Dish extends AbstractNamedEntity {
 
     @Column(name = "price", nullable = false)
-    @Min(value = 1, message = "price of dish must be bigger than {value}")
+    @Min(value = 1, message = "price of dish must be greater than {value}")
     @NotNull(message = "price must not be null")
     private Integer price;
 

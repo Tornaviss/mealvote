@@ -20,6 +20,7 @@ import static com.mealvote.util.ValidationUtil.checkNew;
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class MenuRestController {
     static final String REST_URL = "/menus";
+    static final String POST_REST_URL = "/restaurants/{restaurantId}/menu";
 
     private final MenuService service;
 
@@ -51,7 +52,7 @@ public class MenuRestController {
         service.update(menu, restaurantId);
     }
 
-    @PostMapping(path = "/restaurants/{restaurantId}/menu", consumes = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = POST_REST_URL, consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public ResponseEntity<Menu> create(@Valid @RequestBody Menu menu, @PathVariable int restaurantId) {
         checkNew(menu);

@@ -131,7 +131,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createNameNotValid() throws Exception {
+    void createNameInvalid() throws Exception {
         User created = getCreated();
         created.setName(SHORT_NAME.toString());
 
@@ -144,7 +144,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createEmailNotValid() throws Exception {
+    void createEmailInvalid() throws Exception {
         User created = getCreated();
         created.setEmail(MALFORMED_EMAIL.toString());
 
@@ -157,7 +157,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createPasswordNotValid() throws Exception {
+    void createPasswordInvalid() throws Exception {
         User created = getCreated();
         created.setPassword(SHORT_PASSWORD.toString());
 
@@ -237,7 +237,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateEmailNotValid() throws Exception {
+    void updateEmailInvalid() throws Exception {
         User updated = getUpdated();
         updated.setEmail(MALFORMED_EMAIL.toString());
 
@@ -250,7 +250,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateNameNotValid() throws Exception {
+    void updateNameInvalid() throws Exception {
         User updated = getUpdated();
         updated.setName(SHORT_NAME.toString());
 
@@ -263,7 +263,7 @@ class AdminRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updatePasswordNotValid() throws Exception {
+    void updatePasswordInvalid() throws Exception {
         User updated = getUpdated();
         updated.setPassword(SHORT_PASSWORD.toString());
 

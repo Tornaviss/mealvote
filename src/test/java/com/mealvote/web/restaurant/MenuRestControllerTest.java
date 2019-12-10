@@ -42,6 +42,8 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     @Autowired
     private DishService dishService;
 
+    private static final String POST_REST_URL = MenuRestController.POST_REST_URL.replace("{restaurantId}", "%d");
+
     @Test
     void get() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + VEGANO_ID)
@@ -152,7 +154,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateDishesCountNotValid() throws Exception {
+    void updateDishesCountInvalid() throws Exception {
         Menu updated = getUpdated();
         updated.setDishes(List.of(VEGANO_DISH1));
 
@@ -165,7 +167,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateDishesNameNotValid() throws Exception {
+    void updateDishesNameInvalid() throws Exception {
         Menu updated = getUpdated();
         updated.getDishes().get(0).setName("a");
 
@@ -178,7 +180,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateDishesPriceNotValid() throws Exception {
+    void updateDishesPriceInvalid() throws Exception {
         Menu updated = getUpdated();
         updated.getDishes().get(0).setPrice(0);
 
@@ -194,7 +196,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     void create() throws Exception {
         Menu created = getCreated();
 
-        ResultActions action = mockMvc.perform(post(String.format("/restaurants/%d/menu", MAFIA_ID))
+        ResultActions action = mockMvc.perform(post(String.format(POST_REST_URL, MAFIA_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -213,7 +215,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     void createAlreadyExist() throws Exception {
         Menu created = getCreated();
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", DOMINOS_ID))
+        mockMvc.perform(post(String.format(POST_REST_URL, DOMINOS_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -226,7 +228,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     void createRestaurantNotFound() throws Exception {
         Menu created = getCreated();
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", 1))
+        mockMvc.perform(post(String.format(POST_REST_URL, 1))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -238,7 +240,7 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     void createForbidden() throws Exception {
         Menu created = getCreated();
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", MAFIA_ID))
+        mockMvc.perform(post(String.format(POST_REST_URL, MAFIA_ID))
                 .with(userHttpBasic(USER))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -247,11 +249,11 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createDishesCountNotValid() throws Exception {
+    void createDishesCountInvalid() throws Exception {
         Menu created = getCreated();
         created.setDishes(List.of(DOMINOS_DISH1));
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", MAFIA_ID))
+        mockMvc.perform(post(String.format(POST_REST_URL, MAFIA_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -260,11 +262,11 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createDishesNameNotValid() throws Exception {
+    void createDishesNameInvalid() throws Exception {
         Menu created = getCreated();
         created.getDishes().get(0).setName("a");
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", MAFIA_ID))
+        mockMvc.perform(post(String.format(POST_REST_URL, MAFIA_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -273,11 +275,11 @@ class MenuRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createDishesPriceNotValid() throws Exception {
+    void createDishesPriceInvalid() throws Exception {
         Menu created = getCreated();
         created.getDishes().get(0).setPrice(0);
 
-        mockMvc.perform(post(String.format("/restaurants/%d/menu", MAFIA_ID))
+        mockMvc.perform(post(String.format(POST_REST_URL, MAFIA_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))

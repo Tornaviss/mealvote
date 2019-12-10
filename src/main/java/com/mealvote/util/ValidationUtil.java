@@ -13,11 +13,11 @@ public class ValidationUtil {
     }
 
     public static <T> T checkNotFoundWithId(T object, int id, String entityType) {
-        return checkNotFound(object, "id=" + id, entityType);
+        return checkNotFound(object, "id = " + id, entityType);
     }
 
     public static void checkNotFoundWithId(boolean found, int id, String entityType) {
-        checkNotFound(found, "id=" + id, entityType);
+        checkNotFound(found, "id = " + id, entityType);
     }
 
     public static <T> T checkNotFound(T object, String msg, String entityType) {

@@ -1,0 +1,13 @@
+
++++ <details><summary> +++
+Show Example
++++ </summary><div> +++
+
+Request:
+
+include::{snippets}/{class}/{method}/http-request.adoc[]
+
+Response:
+
+include::{snippets}/{class}/{method}/http-response.adoc[]
++++ </div></details> +++

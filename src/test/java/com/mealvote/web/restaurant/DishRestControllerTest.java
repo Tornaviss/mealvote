@@ -34,6 +34,8 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     @Autowired
     private DishService service;
 
+    private static final String POST_REST_URL = DishRestController.POST_REST_URL.replace("{menuId}", "%d");
+
     @Test
     void getAll() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL)
@@ -181,7 +183,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updatePriceNotValid() throws Exception {
+    void updatePriceInvalid() throws Exception {
         Dish updated = getUpdatedDish();
         updated.setPrice(0);
 
@@ -194,7 +196,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateNameNotValid() throws Exception {
+    void updateNameInvalid() throws Exception {
         Dish updated = getUpdatedDish();
         updated.setName("a");
 
@@ -210,7 +212,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     void create() throws Exception {
         Dish created = getCreatedDish();
 
-        ResultActions action = mockMvc.perform(post("/menus/" + VEGANO_ID + "/dishes")
+        ResultActions action = mockMvc.perform(post(String.format(POST_REST_URL, VEGANO_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -229,7 +231,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     void createMenuNotFound() throws Exception {
         Dish created = getCreatedDish();
 
-        mockMvc.perform(post("/menus/" + 1 + "/dishes")
+        mockMvc.perform(post(String.format(POST_REST_URL, 1))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -243,7 +245,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
         Dish created = getCreatedDish();
         created.setName(VEGANO_DISH2.getName());
 
-        mockMvc.perform(post("/menus/" + VEGANO_ID + "/dishes")
+        mockMvc.perform(post(String.format(POST_REST_URL, VEGANO_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -255,7 +257,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     void createForbidden() throws Exception {
         Dish created = getCreatedDish();
 
-        mockMvc.perform(post("/menus/" + VEGANO_ID + "/dishes")
+        mockMvc.perform(post(String.format(POST_REST_URL, VEGANO_ID))
                 .with(userHttpBasic(USER))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -264,11 +266,11 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createNameNotValid() throws Exception {
+    void createNameInvalid() throws Exception {
         Dish created = getCreatedDish();
         created.setName("a");
 
-        mockMvc.perform(post("/menus/" + VEGANO_ID + "/dishes")
+        mockMvc.perform(post(String.format(POST_REST_URL, VEGANO_ID))
                 .with(userHttpBasic(ADMIN))
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(JsonUtil.writeValue(created)))
@@ -277,7 +279,7 @@ class DishRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createPriceNotValid() throws Exception {
+    void createPriceInvalid() throws Exception {
         Dish created = getCreatedDish();
         created.setPrice(0);
 

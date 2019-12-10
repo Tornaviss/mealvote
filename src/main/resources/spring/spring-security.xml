@@ -4,17 +4,23 @@
              xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd">
 
+    <beans:bean name="restAccessDeniedHandler"
+                class="com.mealvote.web.security.RestAccessDeniedHandler"/>
+
+    <beans:bean id="authenticationEntryPoint"
+          class="com.mealvote.web.security.RestAuthenticationEntryPoint"/>
+
     <http pattern="/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
-        <http-basic/>
+        <http-basic entry-point-ref="authenticationEntryPoint"/>
 
-        <intercept-url pattern="/menus/**" method="GET" access="isAuthenticated()" />
-        <intercept-url pattern="/menus" method="GET" access="isAuthenticated()" />
+        <intercept-url pattern="/menus/**" method="GET" access="isAuthenticated()"/>
+        <intercept-url pattern="/menus" method="GET" access="isAuthenticated()"/>
 
-        <intercept-url pattern="/dishes/**" method="GET" access="isAuthenticated()" />
-        <intercept-url pattern="/dishes" method="GET" access="isAuthenticated()" />
+        <intercept-url pattern="/dishes/**" method="GET" access="isAuthenticated()"/>
+        <intercept-url pattern="/dishes" method="GET" access="isAuthenticated()"/>
 
-        <intercept-url pattern="/restaurants/**" method="GET" access="isAuthenticated()" />
-        <intercept-url pattern="/restaurants" method="GET" access="isAuthenticated()" />
+        <intercept-url pattern="/restaurants/**" method="GET" access="isAuthenticated()"/>
+        <intercept-url pattern="/restaurants" method="GET" access="isAuthenticated()"/>
 
         <intercept-url pattern="/profile/register" access="isAnonymous()"/>
         <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
@@ -22,9 +28,11 @@
 
         <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')"/>
         <csrf disabled="true"/>
+        <access-denied-handler ref="restAccessDeniedHandler"/>
     </http>
 
-    <beans:bean class="org.springframework.security.crypto.factory.PasswordEncoderFactories" id="passwordEncoder" factory-method="createDelegatingPasswordEncoder"/>
+    <beans:bean class="org.springframework.security.crypto.factory.PasswordEncoderFactories" id="passwordEncoder"
+                factory-method="createDelegatingPasswordEncoder"/>
 
     <authentication-manager>
         <authentication-provider user-service-ref="userService">

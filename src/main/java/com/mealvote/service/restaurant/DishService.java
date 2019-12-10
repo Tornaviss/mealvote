@@ -35,8 +35,8 @@ public class DishService {
         return repository.getAll();
     }
 
-    public List<Dish> getAllForMenu(int menuId) {
-        return repository.getAllForMenu(menuId);
+    public List<Dish> getAllForMenu(int restaurantId) {
+        return repository.getAllForMenu(restaurantId);
     }
 
     @Transactional
@@ -45,9 +45,9 @@ public class DishService {
     }
 
     @Transactional
-    public Dish create(Dish dish, int menuId) {
+    public Dish create(Dish dish, int restaurantId) {
         Assert.notNull(dish, "dish must not be null");
-        dish.setMenu(menuRepository.getOne(menuId));
+        dish.setMenu(menuRepository.getOne(restaurantId));
         return repository.save(dish);
     }
 

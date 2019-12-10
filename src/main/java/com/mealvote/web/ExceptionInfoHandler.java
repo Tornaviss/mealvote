@@ -50,7 +50,8 @@ public class ExceptionInfoHandler {
     private static final Map<String, String> ENTITY_NOT_FOUND_CONSTRAINTS = Map.of(
             "constraint_45", "restaurant",
             "constraint_e0", "restaurant",
-            "constraint_78", "menu");
+            "constraint_78", "menu"
+    );
 
     @ExceptionHandler({DataIntegrityViolationException.class})
     public ExceptionInfo conflict(HttpServletRequest req, HttpServletResponse response, DataIntegrityViolationException e) {
@@ -125,7 +126,7 @@ public class ExceptionInfoHandler {
 
     private ExceptionInfo logAndGetErrorInfo(HttpServletRequest req, Exception e, boolean logException, String... details) {
         Throwable rootCause = ValidationUtil.logAndGetRootCause(log, req, e, logException);
-        return new ExceptionInfo(e.getClass().getSimpleName(),
+        return new ExceptionInfo(
                 req.getRequestURL(),
                 details.length != 0 ? details : new String[]{ValidationUtil.getMessage(rootCause)});
     }

@@ -1,0 +1,1425 @@
+:toc:
+:toc: left
+:toclevels: 4
+:source-highlighter: coderay
+:coderay-css: style
+
+= API guide
+
+:numbered:
+:nofooter:
+:sourcedir-root: ../../..
+:sourcedir: {sourcedir-root}/src/main/java/com/mealvote/web/user
+
+This guide provides detailed description of available endpoints with the examples of their usage.
+
+== General User Functionality
+
+=== Registration and Profile management
+
+:class: profile-rest-controller-test
+
+==== Register
+Creates new user passed through the request body with default authorities and returns resulted json representation and URL of created resource.
+The user must not contain `id` field or it's value must be `null`, otherwise `422 Unprocessable Entity` error code will be returned.
+
+The endpoint is intended to be used by unauthorized client.
+--
+--
+* *URL*
+
+`POST profile/register`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the user | Must be null
+| name | String | false | Name of the user | Must be between 2 and 100 characters long
+| email | String | false | Email of the user | *Unique*. Must be not blank, well-formed and up to 100 characters long.
+| password | String | false | Password of the user | Must be between 5 and 100 characters long
+|====
+
+* *Status codes*
+--
+--
+ `201 Created`::
+_in case of successful request execution_
+
+:method: register
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+    _if any field of user passed through request's body has not passed binding-stage validation_
+
+:method: register-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+    _if one or more of the passed user's field values is already existing_
+
+:method: register-email-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if authorization has been attached to the request_
+
+:method: register-forbidden
+include::example.adoc[]
+
+==== Show profile
+
+Returns json data about authorized user.
+
+* *URL*
+
+`GET profile`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: get-unauthorized
+include::example.adoc[]
+
+==== Update profile
+
+Updates authorized user state with data passed within request body. Note that `role`, `enabled` and `registered`
+fields will not be used in the update even if they are also presented in the object.
+
+* *URL*
+
+`PUT profile`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the user | Must not be null and should match authorized user's `id` field value
+| name | String | false | Name of the user | Must be between 2 and 100 characters long
+| email | String | false | Email of the user | *Unique*. Must be not blank, well-formed and up to 100 characters long.
+| password | String | false | Password of the user | Must be between 5 and 100 characters long
+|====
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: update-unauthorized
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+    _if any field of the user has not passed binding stage validation_
+
+:method: update-password-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+    _if one or more of the user's field values already exist_
+
+:method: update-email-duplicate
+include::example.adoc[]
+
+==== Delete profile
+
+Deletes authorized user.
+
+* *URL*
+
+`DELETE profile`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: delete
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: delete-unauthorized
+include::example.adoc[]
+
+=== Voting
+
+:class: choice-rest-controller-test
+
+==== Make choice
+
+Creates choice for authorized user using `restaurantId` URL parameter and returns it's data in json format.
+
+* *URL*
+
+`POST profile/choice/{restaurantId}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant to choose
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`201 Created`::
+    _in case of successful request execution_
+
+:method: create
+include::example.adoc[]
+
+`404 Not Found`::
+    _if restaurant with `restaurantId` parameter was not found_
+
+:method: create-restaurant-not-found
+include::example.adoc[]
+
+`409 Conflict`::
+    _if `choice` for authorized user already exist_
+
+:method: create-already-exist
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: create-unauthorized
+include::example.adoc[]
+
+==== Show choice
+
+Returns json data about authorized user's choice.
+
+* *URL*
+
+`GET profile/choice`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`404 Not Found`::
+    _if choice for authorized user has not been found_
+
+:method: get-not-found
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: get-unauthorized
+include::example.adoc[]
+
+==== Change choice
+
+Updates authorized user's choice. If it is in the same day as the choice has been created:
+--
+[circle]
+* if it is before 11:00 we assume that he changed his mind;
+* if it is after 11:00 then it is too late, vote can't be changed.
+--
+
+* *URL*
+
+`PUT profile/choice/{restaurantId}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant to choose
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+    _in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`404 Not Found`::
+    _if either restaurant with `id=restaurantId` or choice for the user has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`409 Conflict`::
+    _if choice cannot be changed right now_
+
+:method: update-too-late
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: update-unauthorized
+include::example.adoc[]
+
+=== Restaurant, menus and dishes retrieval endpoints
+
+==== Show all restaurants
+
+:class: restaurant-rest-controller-test
+
+Returns list of all persisted restaurants in json sorted by name in ascending order. If nothing was found, returns empty list instead.
+
+* *URL*
+
+`GET restaurants`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+    _in case of successful request execution_
+
+:method: get-all
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: get-all-unauthorized
+include::example.adoc[]
+
+==== Show restaurant
+
+Return json data about single restaurant.
+
+* *URL*
+
+`GET restaurants/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant to show
+|====
+
+* *Query params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | true | The value indicating whenever to fetch or not the related list of choices, `false` by default
+|====
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+    _in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`404 Not Found`::
+    _if restaurant with specified `id' has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`401 Unauthorized`::
+    _if authorization has not been attached to the request_
+
+:method: get-unauthorized
+include::example.adoc[]
+
+==== Show menu
+
+:class: menu-rest-controller-test
+
+Returns json data about single menu with it's dishes.
+
+* *URL*
+
+`GET menus/{restaurantId}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant containing menu to show
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant with specified `restaurantId' has not been found or menu for that restaurant has not been created_
+
+:method: get-not-found
+include::example.adoc[]
+
+`401 Unauthorized`::
+_if authorization has not been attached to the request_
+
+:method: get-unauthorized
+include::example.adoc[]
+
+==== Show all dishes
+
+:class: dish-rest-controller-test
+
+Returns list of all persisted dishes in json format sorted by name in ascending order. If nothing was found, returns empty list instead.
+
+* *URL*
+
+`GET dishes`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get-all
+include::example.adoc[]
+
+`401 Unauthorized`::
+_if authorization has not been attached to the request_
+
+:method: get-all-unauthorized
+include::example.adoc[]
+
+==== Show dish
+
+Returns json data about single dish.
+
+* *URL*
+
+`GET dishes/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of dish to show
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`404 Not Found`::
+_if dish with specified `id' has not been found_
+
+:method: get-not-found
+include::example.adoc[]
+
+`401 Unauthorized`::
+_if authorization has not been attached to the request_
+
+:method: get-unauthorized
+include::example.adoc[]
+
+== Admin Functionality
+
+=== Create and manage users
+
+:class: admin-rest-controller-test
+
+==== Show all users
+
+Returns list of all persisted users in json format sorted by name and email in ascending order. If nothing was found, returns empty list instead.
+
+* *URL*
+
+`GET admin/users`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get-all
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: get-all-forbidden
+include::example.adoc[]
+
+==== Show user
+
+Returns json data about single user.
+
+* *URL*
+
+`GET admin/users/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of user to show
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+:method: get
+include::example.adoc[]
+
+`404 Not Found`::
+_if user with specified `id' has not been found_
+
+:method: get-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: get-forbidden
+include::example.adoc[]
+
+==== Show user by email
+
+Returns json data about single user which `email` property value equal to the one specified in query parameters.
+
+* *URL*
+
+`GET admin/users/by`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| email | String | false | The email of user to show
+|====
+
+* *Status codes*
+--
+--
+`200 OK`::
+_in case of successful request execution_
+
+* *Body params*
+
+None
+
+:method: get-by-email
+include::example.adoc[]
+
+`404 Not Found`::
+_if user with specified `email` has not been found_
+
+:method: get-by-email-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: get-by-email-forbidden
+include::example.adoc[]
+
+==== Create user
+
+Creates new user passed through the request body and returns resulted json representation and URL of created resource.
+
+* *URL*
+
+`POST admin/users`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the user | Must be null
+| name | String | false | Name of the user | Must be between 2 and 100 characters long
+| email | String | false | Email of the user | *Unique*. Must be not blank, well-formed and up to 100 characters long
+| password | String | false | Password of the user | Must be between 5 and 100 characters long
+| roles | String[] | true | Set of the user's authorities. Authorities can be `ROLE_USER` and/or `ROLE_ADMIN` |
+| enabled | Boolean | true | Indicates whenever the user is enabled or not. A disabled user cannot be authenticated |
+|====
+
+* *Status codes*
+--
+--
+ `201 Created`::
+_in case of successful request execution_
+
+:method: create
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any field of user passed through request's body has not passed binding-stage validation_
+
+:method: create-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if one or more of the passed user's field values is already existing_
+
+:method: create-email-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: create-forbidden
+include::example.adoc[]
+
+==== Update user
+
+Updates user with specified `id` field value with data passed within request body.
+
+* *URL*
+
+`PUT admin/users/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of user to update
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | false | Unique identifier of the user | Must not be `null` and should match the `id` path parameter value
+| name | String | false | Name of the user | Must be between 2 and 100 characters long
+| email | String | false | Email of the user | *Unique*. Must be not blank, well-formed and up to 100 characters long
+| password | String | false | Password of the user | Must be between 5 and 100 characters long
+| roles | String[] | true | Set of the user's authorities. Authorities can be `ROLE_USER` and/or `ROLE_ADMIN` |
+| enabled | Boolean | true | Indicates whenever the user is enabled or not. A disabled user cannot be authenticated |
+|====
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`404 Not Found`::
+_if user with specified `id` has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any field of the user has not passed binding stage validation_
+
+:method: update-password-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if one or more of the user's field values already exist_
+
+:method: update-email-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: update-forbidden
+include::example.adoc[]
+
+==== Enable/disable user
+
+Updates `enabled` field of user with `id` property equal to `id` URL param. A disabled user cannot be authenticated.
+
+* *URL*
+
+`PATCH admin/users/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of user to enable/disable
+|====
+
+* *Query params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| enabled | Boolean | false | The value indicating should the user be enabled or disabled
+|====
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: enable
+include::example.adoc[]
+
+`404 Not Found`::
+_if user with specified `id` has not been found_
+
+:method: enable-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: enable-forbidden
+include::example.adoc[]
+
+==== Delete user
+
+Deletes user with specified `id` property value.
+
+* *URL*
+
+`DELETE admin/users/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of user to delete
+|====
+
+* *Query params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: delete
+include::example.adoc[]
+
+`404 Not Found`::
+_if user with specified `id` has not been found_
+
+:method: delete-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: delete-forbidden
+include::example.adoc[]
+
+=== Create and manage restaurants
+
+:class: restaurant-rest-controller-test
+
+==== Create restaurant
+
+Creates new restaurant passed through the request body and returns resulted json representation along with URL of created resource in header.
+
+* *URL*
+
+`POST restaurants`
+
+* *Path params*
+
+None
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the restaurant | Must be null
+| name | String | false | Name of the restaurant | *Unique.* Must be between 2 and 100 characters long
+|====
+
+* *Status codes*
+--
+--
+ `201 Created`::
+_in case of successful request execution_
+
+:method: create
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any field of restaurant passed through request's body has not passed binding-stage validation_
+
+:method: create-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if one or more of the passed user's field values is already existing_
+
+:method: create-name-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: create-forbidden
+include::example.adoc[]
+
+==== Update restaurant
+
+Updates user with specified `id` field value with data passed within request body.
+
+* *URL*
+
+`PUT restaurants/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of restaurant to update
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | false | Unique identifier of the restaurant | Must not be null and should match `id` path parameter value
+| name | String | false | Name of the restaurant | *Unique.* Must be between 2 and 100 characters long
+|====
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant with specified `id` has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any field of the restaurant has not passed binding stage validation_
+
+:method: update-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if one or more of the restaurant field values already exist_
+
+:method: update-name-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+==== Delete restaurant
+
+Deletes restaurant by it's id.
+
+NOTE:: On restaurant deletion the assigned menu will be deleted as well.
+
+
+* *URL*
+
+`DELETE restaurants/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of restaurant to delete
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: delete
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant with specified `id` has not been found_
+
+:method: delete-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: delete-forbidden
+include::example.adoc[]
+
+=== Create and manage restaurant menus
+
+:class: menu-rest-controller-test
+
+==== Create restaurant menu
+
+Creates menu for restaurant with specified `id` field value and returns resulted json representation
+along with URL of created resource in header.
+
+NOTE:: Only one menu for a restaurant can exist, attempt to create one for a restaurant
+which already has one will cause exception and `409 Conflict` status code will be returned.
+
+* *URL*
+
+`POST restaurants/{restaurantId}/menu`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of the restaurant
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| restaurantId | Integer | true | The identifier of the restaurant | Must be null
+| dishes | Dish[] | false | Contents of the menu | Must contain at least 2 items
+|====
+Every item of the `dishes` array should contain the following fields:
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the dish | Must be `null`
+| name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
+| price | Integer | false | Price of the dish | Must be greater than 1
+|====
+* *Status codes*
+--
+--
+ `201 Created`::
+_in case of successful request execution_
+
+:method: create
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant with specified `id` has not been found_
+
+:method: create-restaurant-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any dish from menu `dishes` field has not passed binding-stage validation or `dishes` count is less then 2 items_
+
+:method: create-dishes-count-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if menu for the restaurant is already exist or the menu contains dishes with duplicate `name` field value_
+
+:method: create-already-exist
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: create-forbidden
+include::example.adoc[]
+
+==== Update menu
+
+Updates restaurant menu with specified `restaurantId` field value.
+
+* *URL*
+
+`PUT menus/{restaurantId}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant containing the menu to update
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| restaurantId | Integer | false | The identifier of the restaurant | Must not be `null` and should match `restaurantId` path parameter value
+| dishes | Dish[] | false | Contents of the menu | Must contain at least 2 items
+|====
+Every item of the `dishes` array should contain the following fields:
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the dish | If presented, must match any existing one
+| name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
+| price | Integer | false | Price of the dish | Must be greater than 1
+|====
+
+IMPORTANT:: If you want to update some dish containing in the menu you should include it's updated fields
+within `dishes` array along with the same `id` field value. If `id` was not specified within the parameters or equal to `null`,
+then new dish will be created
+
+
+WARNING:: All existing dishes of the menu that was not included in `dishes` request body parameter would be deleted.
+--
+--
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant, menu with specified `restaurantId` or any of the dishes meant to update has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any dish from menu `dishes` field has not passed binding-stage validation or `dishes` count is less then 2 items_
+
+:method: update-dishes-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if menu for the restaurant is already exist or the menu contains dishes with duplicate `name` field value_
+
+:method: update-dish-name-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: update-forbidden
+include::example.adoc[]
+
+==== Delete menu
+
+Deletes restaurant menu with specified `restaurantId` field value.
+
+NOTE:: On menu deletion the assigned dishes will be deleted as well.
+
+* *URL*
+
+`DELETE menus/{restaurantId}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant containing the menu to delete
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+`204 No Content`::
+_in case of successful request execution_
+
+:method: delete
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant or menu with specified `id` has not been found_
+
+:method: delete-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: delete-forbidden
+include::example.adoc[]
+
+=== Create and manage dishes
+
+:class: dish-rest-controller-test
+
+==== Create dish
+
+Creates a dish using request body parameters and includes it in content of menu of restaurant with specified
+`id` field value. Returns json of created dish along with it's URL location within response header.
+
+* *URL*
+
+`POST menus/{restaurantId}/dishes`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant containing the menu
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | true | Unique identifier of the dish | Must be `null`
+| name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
+| price | Integer | false | Price fo the dish | Must be greater than 1
+|====
+
+* *Status codes*
+--
+--
+ `201 Created`::
+_in case of successful request execution_
+
+:method: create
+include::example.adoc[]
+
+`404 Not Found`::
+_if restaurant or menu with specified `restaurantId` has not been found_
+
+:method: create-menu-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any dish field has not passed binding-stage validation_
+
+:method: create-price-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if the menu already contains dish with the same `name` field value_
+
+:method: create-name-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: create-forbidden
+include::example.adoc[]
+
+==== Update dish
+
+Updates dish with specified `id` field value.
+
+* *URL*
+
+`PUT dishes/{id}`
+
+* *Path params*
+
+*Required*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of dish to update
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description* | *Constrains*
+| id | Integer | false | Unique identifier of the dish | Must not be `null` and should match `id` path parameter value
+| name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
+| price | Integer | false | Price of the dish | Must be greater than 1
+|====
+
+* *Status codes*
+--
+--
+ `204 No Content`::
+_in case of successful request execution_
+
+:method: update
+include::example.adoc[]
+
+`404 Not Found`::
+_if menu of the restaurant with specified `id` has not been found_
+
+:method: update-not-found
+include::example.adoc[]
+
+`422 Unprocessable Entity`::
+_if any dish field has not passed binding-stage validation_
+
+:method: update-name-invalid
+include::example.adoc[]
+
+`409 Conflict`::
+_if the menu already contains dish with the same `name` field value_
+
+:method: update-name-duplicate
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: update-forbidden
+include::example.adoc[]
+
+==== Delete dish
+
+Deletes dish by `id`.
+
+* *URL*
+
+`DELETE dishes/{id}`
+
+* *Path params*
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | false | The identifier of dish to delete
+|====
+
+* *Query params*
+
+None
+
+* *Body params*
+
+None
+
+* *Status codes*
+--
+--
+ `204 No Content`::
+_in case of successful request execution_
+
+:method: delete
+include::example.adoc[]
+
+`404 Not Found`::
+_if dish with specified `id` has not been found_
+
+:method:delete-not-found
+include::example.adoc[]
+
+`403 Forbidden`::
+_if user has no authorities to make this request_
+
+:method: delete-forbidden
+include::example.adoc[]

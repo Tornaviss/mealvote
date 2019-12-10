@@ -169,19 +169,6 @@ class ProfileRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateIdNotMatch() throws Exception {
-        User updated = getUpdated();
-        updated.setId(1);
-
-        mockMvc.perform(put(REST_URL)
-                .with(userHttpBasic(USER))
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonWithPassword(updated, updated.getPassword())))
-                .andDo(print())
-                .andExpect(status().isUnprocessableEntity());
-    }
-
-    @Test
     void updateNameInvalid() throws Exception {
         User updated = getUpdated();
         updated.setName(SHORT_NAME.toString());

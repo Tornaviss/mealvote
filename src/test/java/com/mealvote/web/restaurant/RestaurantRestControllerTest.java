@@ -80,6 +80,14 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
+    void deleteNotFound() throws Exception {
+        mockMvc.perform(MockMvcRequestBuilders.delete(REST_URL + "/" + 1)
+                .with(userHttpBasic(ADMIN)))
+                .andDo(print())
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
     void deleteForbidden() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.delete(REST_URL + "/" + DOMINOS_ID)
                 .with(userHttpBasic(USER)))
@@ -115,7 +123,7 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void updateNameNotValid() throws Exception {
+    void updateNameInvalid() throws Exception {
         Restaurant updated = getUpdated();
         updated.setName("a");
 
@@ -186,7 +194,7 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void createNameNotValid() throws Exception {
+    void createNameInvalid() throws Exception {
         Restaurant created = getCreated();
         created.setName("a");
 

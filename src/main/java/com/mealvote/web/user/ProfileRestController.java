@@ -49,7 +49,7 @@ public class ProfileRestController {
         user.setRoles(Collections.singleton(Role.ROLE_USER));
         User created = service.create(user);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()
-                .path("/profile" + "/{id}")
+                .path(REST_URL + "/{id}")
                 .buildAndExpand(created.getId()).toUri();
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
@@ -57,7 +57,7 @@ public class ProfileRestController {
     @PutMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody User user) {
-        assureIdConsistent(user, authUserId());
+        user.setId(authUserId());
         user.setRoles(authUserRoles());
         user.setEnabled(authUserEnabled());
         service.update(user);
