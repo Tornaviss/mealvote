@@ -44,12 +44,12 @@
                         <goal>process-asciidoc</goal>
                     </goals>
                     <configuration>
+                        <sourceDocumentName>api-guide.adoc</sourceDocumentName>
                         <backend>html5</backend>
                         <doctype>book</doctype>
                         <attributes>
                             <snippets>${snippetsDirectory}</snippets>
                             <encoding>utf-8</encoding>
-
                         </attributes>
                     </configuration>
                 </execution>

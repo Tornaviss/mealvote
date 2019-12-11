@@ -6,7 +6,6 @@ import java.time.LocalDateTime;
 import java.util.Comparator;
 
 import static com.mealvote.RestaurantTestData.DOMINOS;
-import static com.mealvote.RestaurantTestData.VEGANO;
 import static com.mealvote.UserTestData.USER;
 import static com.mealvote.UserTestData.USER_ID;
 

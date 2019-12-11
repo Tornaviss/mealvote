@@ -24,7 +24,6 @@ import static com.mealvote.MenuTestData.*;
 import static com.mealvote.RestaurantTestData.MAFIA_ID;
 import static com.mealvote.RestaurantTestData.VEGANO_ID;
 import static com.mealvote.RestaurantTestData.DOMINOS_ID;
-import static com.mealvote.RestaurantTestData.DOMINOS;
 import static com.mealvote.UserTestData.ADMIN;
 import static com.mealvote.UserTestData.USER;
 import static com.mealvote.UserTestData.userHttpBasic;

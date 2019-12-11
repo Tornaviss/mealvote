@@ -25,7 +25,7 @@ public class ChoiceAuditTrigger implements Trigger {
     public void fire(Connection connection, Object[] oldRow, Object[] newRow) throws SQLException {
         try (PreparedStatement stmt =
                      (operation == UPDATE || operation == INSERT
-                             ? prepareSaveStatement(connection, oldRow, newRow)
+                             ? prepareSaveStatement(connection, newRow)
                              : prepareDeleteStatement(connection, oldRow))) {
             stmt.execute();
         } catch(SQLException e) {
@@ -43,7 +43,7 @@ public class ChoiceAuditTrigger implements Trigger {
 
     }
 
-    private PreparedStatement prepareSaveStatement(Connection connection, Object[] oldRow, Object[] newRow) throws SQLException {
+    private PreparedStatement prepareSaveStatement(Connection connection, Object[] newRow) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(
                 "INSERT INTO user_choices_history (user_id, restaurant_id, date_time, action, username, action_timestamp) " +
                         "VALUES (?, ?, ?, ?, ?, ?)");

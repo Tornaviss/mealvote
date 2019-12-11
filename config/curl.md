@@ -1,4 +1,4 @@
-### curl samples (application deployed in application context `mealvote`).
+### curl samples (application deployed in application context `mealvote`)
 > For windows use `Git Bash`
 
 #### get All Users

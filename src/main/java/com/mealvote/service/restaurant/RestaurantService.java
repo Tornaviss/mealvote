@@ -1,7 +1,6 @@
 package com.mealvote.service.restaurant;
 
 import com.mealvote.model.restaurant.Restaurant;
-import com.mealvote.model.user.Choice;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;

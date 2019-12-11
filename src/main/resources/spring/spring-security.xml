@@ -10,6 +10,8 @@
     <beans:bean id="authenticationEntryPoint"
           class="com.mealvote.web.security.RestAuthenticationEntryPoint"/>
 
+    <http pattern="/static/docs**" security="none"/>
+
     <http pattern="/**" use-expressions="true" name="restSecurityFilterChain" create-session="stateless">
         <http-basic entry-point-ref="authenticationEntryPoint"/>
 
@@ -25,7 +27,7 @@
         <intercept-url pattern="/profile/register" access="isAnonymous()"/>
         <intercept-url pattern="/profile/**" access="isAuthenticated()"/>
         <intercept-url pattern="/profile" access="isAuthenticated()"/>
-
+        <intercept-url pattern="/docs" access="permitAll()"/>
         <intercept-url pattern="/**" access="hasRole('ROLE_ADMIN')"/>
         <csrf disabled="true"/>
         <access-denied-handler ref="restAccessDeniedHandler"/>

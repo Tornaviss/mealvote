@@ -3,7 +3,6 @@ package com.mealvote.service.user;
 import com.mealvote.AuthorizedUser;
 import com.mealvote.model.user.User;
 import com.mealvote.repository.user.CrudUserRepository;
-import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;

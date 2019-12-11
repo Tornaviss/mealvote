@@ -3,7 +3,6 @@ package com.mealvote;
 import com.mealvote.model.restaurant.Dish;
 import com.mealvote.model.restaurant.Menu;
 
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 

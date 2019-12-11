@@ -3,8 +3,6 @@ package com.mealvote.service.restaurant;
 import com.mealvote.MenuTestData;
 import com.mealvote.model.restaurant.Dish;
 import com.mealvote.model.restaurant.Menu;
-import com.mealvote.util.exception.IllegalOperationException;
-import com.mealvote.util.exception.IllegalRequestDataException;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,7 +11,6 @@ import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.test.context.junit.jupiter.SpringJUnitConfig;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 

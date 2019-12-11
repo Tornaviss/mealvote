@@ -8,4 +8,12 @@ public class ExceptionInfo {
         this.url = url.toString();
         this.details = details;
     }
+
+    public String getUrl() {
+        return url;
+    }
+
+    public String[] getDetails() {
+        return details;
+    }
 }

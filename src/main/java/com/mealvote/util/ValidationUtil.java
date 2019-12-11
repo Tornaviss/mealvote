@@ -7,7 +7,7 @@ import org.slf4j.Logger;
 
 import javax.servlet.http.HttpServletRequest;
 
-public class ValidationUtil {
+public final class ValidationUtil {
 
     private ValidationUtil() {
     }

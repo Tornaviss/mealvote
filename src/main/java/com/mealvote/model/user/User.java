@@ -6,7 +6,6 @@ import com.mealvote.model.AbstractNamedEntity;
 import com.mealvote.util.DateTimeUtil;
 import org.hibernate.annotations.BatchSize;
 import org.hibernate.validator.constraints.SafeHtml;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.util.CollectionUtils;
 
 import javax.persistence.*;

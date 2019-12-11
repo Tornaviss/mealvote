@@ -6,7 +6,6 @@ import com.mealvote.model.AbstractNamedEntity;
 import javax.persistence.*;
 import javax.validation.constraints.Min;
 import javax.validation.constraints.NotNull;
-import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "dishes", uniqueConstraints =

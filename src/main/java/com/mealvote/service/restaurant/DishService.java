@@ -3,7 +3,6 @@ package com.mealvote.service.restaurant;
 import com.mealvote.model.restaurant.Dish;
 import com.mealvote.repository.restaurant.CrudDishRepository;
 import com.mealvote.repository.restaurant.CrudMenuRepository;
-import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -29,8 +29,8 @@ public class UserTestData {
         return new User(USER_ID, "Updated", "updated@gmail.com", "updatedPass",
                 USER.isEnabled(), USER.getRegistered(), USER.getRoles());
     }
-    public static String jsonWithPassword(User user, String passw) {
-        return JsonUtil.writeAdditionProps(user, "password", passw);
+    public static String jsonWithPassword(User user, String password) {
+        return JsonUtil.writeAdditionProps(user, "password", password);
     }
 
     public static RequestPostProcessor userHttpBasic(User user) {

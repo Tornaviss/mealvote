@@ -9,7 +9,7 @@ import java.util.Collection;
 
 import static java.util.Objects.requireNonNull;
 
-public class SecurityUtil {
+public final class SecurityUtil {
 
     private SecurityUtil() {
     }

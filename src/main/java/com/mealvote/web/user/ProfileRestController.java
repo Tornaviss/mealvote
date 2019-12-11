@@ -14,7 +14,6 @@ import javax.validation.Valid;
 import java.net.URI;
 import java.util.Collections;
 
-import static com.mealvote.util.ValidationUtil.assureIdConsistent;
 import static com.mealvote.util.ValidationUtil.checkNew;
 import static com.mealvote.web.SecurityUtil.*;
 import static com.mealvote.web.user.ProfileRestController.REST_URL;
