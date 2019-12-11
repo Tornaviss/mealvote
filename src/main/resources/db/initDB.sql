@@ -78,6 +78,8 @@ CREATE TABLE dishes_history
     active           BOOLEAN DEFAULT TRUE NOT NULL
 );
 
+//trigger classes will become visible in classpath at build time, comment the creation in case of manual DB initialization
+
 CREATE TRIGGER dishes_update_audit_trail
     AFTER UPDATE
     ON dishes
@@ -107,6 +109,8 @@ CREATE TABLE user_choices_history
     action           VARCHAR              NOT NULL,
     active           BOOLEAN DEFAULT TRUE NOT NULL
 );
+
+//trigger classes will become visible in classpath at build time, comment the creation in case of manual DB initialization
 
 CREATE TRIGGER user_choices_create_audit_trigger
     AFTER INSERT

@@ -37,7 +37,7 @@
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).STATEMENT_BATCH_SIZE}" value="5" />
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).ORDER_UPDATES}" value="true" />
                 <entry key="#{T(org.hibernate.cfg.AvailableSettings).ORDER_INSERTS}" value="true" />
-<!--                <entry key="#{T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS}" value="true" />-->
+                <entry key="#{T(org.hibernate.cfg.AvailableSettings).GENERATE_STATISTICS}" value="true" />
 
             </map>
         </property>

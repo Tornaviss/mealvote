@@ -10,8 +10,9 @@ import org.springframework.util.Assert;
 
 import java.util.*;
 
-import static com.mealvote.util.MenuUtil.*;
-import static com.mealvote.util.ValidationUtil.*;
+import static com.mealvote.util.MenuUtil.refreshDishes;
+import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
+
 
 @Service
 @Transactional(readOnly = true)

@@ -40,9 +40,7 @@ public abstract class AbstractRestControllerTest {
                 .webAppContextSetup(webApplicationContext)
                 .addFilter(CHARACTER_ENCODING_FILTER)
                 .apply(springSecurity())
-                .apply(documentationConfiguration(restDocumentation).uris()
-                        .withScheme("http")
-                        .withHost("mealvote.com"))
+                .apply(documentationConfiguration(restDocumentation))
                 .alwaysDo(document("{class-name}/{method-name}",
                         preprocessRequest(prettyPrint()), preprocessResponse(prettyPrint())))
                 .build();
