@@ -16,6 +16,7 @@ import java.net.URI;
 import java.util.List;
 
 import static com.mealvote.util.ValidationUtil.*;
+import static com.mealvote.web.SecurityUtil.authUserId;
 import static com.mealvote.web.restaurant.RestaurantRestController.REST_URL;
 
 @RestController
@@ -36,25 +37,27 @@ public class RestaurantRestController {
     public Restaurant get(
             @PathVariable int id,
             @RequestParam(value = "includeChoices", required = false, defaultValue = "false") boolean includeChoices) {
-        LOGG.info("get {} " + (includeChoices ? "including" : "not including") + " choices", id);
+        LOGG.info("get {} " + (includeChoices ? "including" : "not including") + " choices for user {}", id, authUserId());
         return includeChoices ? eraseParentLinks(service.getWithChoices(id)) : service.get(id);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void delete(@PathVariable int id) {
+        LOGG.info("delete {}", id);
         service.delete(id);
     }
 
     @GetMapping
     public List<Restaurant> getAll() {
-        LOGG.info("getAll");
+        LOGG.info("getAll for user {}", authUserId());
         return service.getAll();
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.NO_CONTENT)
     public void update(@Valid @RequestBody Restaurant restaurant, @PathVariable int id) {
+        LOGG.info("update {} with {}", id, restaurant);
         assureIdConsistent(restaurant, id);
         service.update(restaurant, id);
     }
@@ -62,6 +65,7 @@ public class RestaurantRestController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE)
     @ResponseStatus(value = HttpStatus.CREATED)
     public ResponseEntity<Restaurant> create(@Valid @RequestBody Restaurant restaurant) {
+        LOGG.info("create {}", restaurant);
         checkNew(restaurant);
         Restaurant created = service.create(restaurant);
         URI uriOfNewResource = ServletUriComponentsBuilder.fromCurrentContextPath()

@@ -2,7 +2,7 @@ package com.mealvote.web;
 
 import com.mealvote.util.ValidationUtil;
 import com.mealvote.util.exception.ExceptionInfo;
-import com.mealvote.util.exception.IllegalOperationException;
+import com.mealvote.util.exception.TemporaryUnavailableOperationException;
 import com.mealvote.util.exception.IllegalRequestDataException;
 import com.mealvote.util.exception.NotFoundException;
 import org.slf4j.Logger;
@@ -88,9 +88,9 @@ public class ExceptionInfoHandler {
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)
-    @ExceptionHandler(IllegalOperationException.class)
-    public ExceptionInfo illegalOperationError(HttpServletRequest req, Exception e) {
-        return logAndGetErrorInfo(req, e, false);
+    @ExceptionHandler(TemporaryUnavailableOperationException.class)
+    public ExceptionInfo temporaryUnavailableOperation(HttpServletRequest req, TemporaryUnavailableOperationException e) {
+        return logAndGetErrorInfo(req, e, false, e.getMessage());
     }
 
     @ResponseStatus(value = HttpStatus.UNPROCESSABLE_ENTITY)  // 422

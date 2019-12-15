@@ -4,7 +4,7 @@ import com.mealvote.model.user.Choice;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.repository.user.CrudChoiceRepository;
 import com.mealvote.repository.user.CrudUserRepository;
-import com.mealvote.util.exception.IllegalOperationException;
+import com.mealvote.util.exception.TemporaryUnavailableOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -64,7 +64,7 @@ public class ChoiceService {
             choice.setRestaurant(restaurantRepository.getOne(restaurantId));
             choice.setDateTime(LocalDateTime.now());
         } else {
-            throw new IllegalOperationException("choice for user " + userId + " cannot be changed now");
+            throw new TemporaryUnavailableOperationException("voting is over for today, try again tomorrow");
         }
     }
 

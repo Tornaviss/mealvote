@@ -2,7 +2,7 @@ package com.mealvote.service.user;
 
 import com.mealvote.RestaurantTestData;
 import com.mealvote.model.user.Choice;
-import com.mealvote.util.exception.IllegalOperationException;
+import com.mealvote.util.exception.TemporaryUnavailableOperationException;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -79,7 +79,7 @@ class ChoiceServiceTest {
 
     @Test
     void updateTooLate() {
-        assertThrows(IllegalOperationException.class, () ->
+        assertThrows(TemporaryUnavailableOperationException.class, () ->
                 service.update(VEGANO_ID, USER_ID, LocalTime.MIN)
         );
     }

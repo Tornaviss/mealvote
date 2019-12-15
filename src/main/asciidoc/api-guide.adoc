@@ -5,13 +5,130 @@
 :coderay-css: style
 
 = API guide
-
+Doc Writer <tornaviss@gmail.com>
+v1.0, 12-12-2019
 :numbered:
 :nofooter:
 :sourcedir-root: ../../..
 :sourcedir: {sourcedir-root}/src/main/java/com/mealvote/web/user
 
-This guide provides detailed description of available endpoints with the examples of their usage.
+This guide provides detailed description of available endpoints with the examples of their usage. The project uses https://en.wikipedia.org/wiki/Basic_access_authentication[basic authentication].
+
+== General Information
+
+=== Model
+
+:numbered!:
+
+In total, the application contains 6 types of entities:
+
+==== User
+
+User object contains user profile metadata and describes the user referenced.
+
+The class contain the following fields:
+|====
+| *Name* | *Type* | *Description*
+| id | Integer | Unique identifier of the user
+| name | String | Name of the user
+| email | String | *Unique* email of the user
+| password | String | Password of the user
+| roles | String[] | Set of the user's authorities
+| enabled | Boolean | Indicates whenever the user is enabled or not. A disabled user cannot be authenticated
+| registered | Date | Date and time of user registration
+|====
+
+==== Role
+
+Enum representing concrete user authorities. Can be:
+
+`ROLE_ADMIN`::
+user with this type of authority can manage all types of entities except user choices
+`ROLE_USER`::
+user with this type of authority can query all types of entities except other users and their choices, but creating, modifying and deleting for that type of user is forbidden
+
+==== Choice
+
+Choice object represents a user choice of restaurant. A choice object shares id with the related user and in case of the user deleted, the related choice is also being deleted.
+
+Contains the following fields:
+
+|====
+| *Name* | *Type* | *Description*
+| userId | Integer | The identifier of related user. Also serves as identifier of a choice since only one choice for a user can exist
+| user | User | The related user. By default this field is not included on querying a choice
+| restaurant | Restaurant | A chosen restaurant object. Included on the querying by default
+| dateTime | LocalDateTime | Date and time of creation or last modifying. Creates and modifies automatically
+|====
+
+==== Restaurant
+
+A restaurant object contains fields describing concrete restaurant. Contains the following fields:
+
+|====
+| *Name* | *Type* | *Description*
+| id | Integer | Unique identifier of the restaurant
+| name | String | *Unique* name of the restaurant
+| choices | List<Choice> | List of user choices of that restaurant
+|====
+
+==== Menu
+
+Every object of that class contains list of dishes and id of related restaurant. If related restaurant is being deleted than it's menu is being deleted automatically.
+Contains the fields:
+
+|====
+| *Name* | *Type*| *Description*
+| restaurantId | Integer | The identifier of related restaurant and of the menu itself
+| restaurant | Restaurant | Related restaurant object, not fetched on querying by default
+| dishes | Dish[] | Contents of the menu
+|====
+
+==== Dish
+
+Represents a dish with it's name and price. Every dish is related to an existing menu and cannot be created without one. If the menu is being deleted, the dish is being deleted as well.
+Contains following fields:
+
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| id | Integer | true | Unique identifier of the dish
+| name | String | false | Name of the dish, should be unique per every concrete menu
+| price | Integer | false | Price of the dish
+| menu | Menu | The related menu object
+|====
+
+:numbered:
+
+=== URI structure
+
+URI structure of the application is designed to have the creation endpoints at the nested endpoint and the canonical endpoints for modifying
+and querying an item not at the nested endpoint.
+If creation path to a nested resource is longer than two items, then first elements of the path are omitted
+to keep resource structure simple and straightforward. For example:
+
+- `POST restaurant` creates a new restaurant and returns a link to the created restaurant along with it's
+json representation in the body
+- `POST restaurant/{restaurantId}/menu` when a restaurant is put, creates the new menu and returns a link
+to the created menu along with the json representation in the body
+- `PUT menus/{restaurantId}` modifies a menu
+- `POST menus/{restaurantId}/dishes` if a restaurant and it's menu is put, creates the new dish,
+includes it to the menu contents and returns the link with the json representation of the dish
+- `GET dishes/{dishId}` returns a dish in json format
+
+=== Error responses
+
+In case of any exception occurrence an ExceptionInfo object is returned within the request body
+along with error status code in the header.
+The object has `url` and `details` fields:
+[circle]
+- `details` field provides information about what exactly went wrong
+- `url` is the URL of requested resource
+
+:class: dish-rest-controller-test
+:method: create-name-invalid
+include::example.adoc[]
+
+:numbered:
 
 == General User Functionality
 
@@ -21,9 +138,8 @@ This guide provides detailed description of available endpoints with the example
 
 ==== Register
 Creates new user passed through the request body with default authorities and returns resulted json representation and URL of created resource.
-The user must not contain `id` field or it's value must be `null`, otherwise `422 Unprocessable Entity` error code will be returned.
 
-The endpoint is intended to be used by unauthorized client.
+The endpoint is intended to be used by unauthorized user.
 --
 --
 * *URL*
@@ -1257,7 +1373,7 @@ include::example.adoc[]
 
 ==== Create dish
 
-Creates a dish using request body parameters and includes it in content of menu of restaurant with specified
+Creates a dish using request body parameters and includes it in menu contents of restaurant with specified
 `id` field value. Returns json of created dish along with it's URL location within response header.
 
 * *URL*
