@@ -21,6 +21,7 @@ public class RestAuthenticationEntryPoint implements AuthenticationEntryPoint {
     public void commence(HttpServletRequest request, HttpServletResponse response, AuthenticationException authException) throws IOException, ServletException {
         LOGG.debug("Unauthenticated access attempt to URL: {}", request.getRequestURL());
         ExceptionInfo info = new ExceptionInfo(request.getRequestURL(), "you are unauthorized to make this request");
+        response.setHeader("WWW-Authenticate", "Basic");
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
         Writer writer = response.getWriter();
         writer.write(writeValue(info));

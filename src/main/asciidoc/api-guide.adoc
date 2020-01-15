@@ -8,6 +8,7 @@
 Doc Writer <tornaviss@gmail.com>
 v1.0, 12-12-2019
 :numbered:
+:sectanchors:
 :nofooter:
 :sourcedir-root: ../../..
 :sourcedir: {sourcedir-root}/src/main/java/com/mealvote/web/user
@@ -18,20 +19,18 @@ This guide provides detailed description of available endpoints with the example
 
 === Model
 
-:numbered!:
-
-In total, the application contains 6 types of entities:
+In total, the application has 6 types of entities.
 
 ==== User
 
-User object contains user profile metadata and describes the user referenced.
+User object contains the user profile metadata and describes the user referenced.
 
-The class contain the following fields:
+Contains the following fields:
 |====
 | *Name* | *Type* | *Description*
 | id | Integer | Unique identifier of the user
 | name | String | Name of the user
-| email | String | *Unique* email of the user
+| email | String | Unique email of the user
 | password | String | Password of the user
 | roles | String[] | Set of the user's authorities
 | enabled | Boolean | Indicates whenever the user is enabled or not. A disabled user cannot be authenticated
@@ -40,36 +39,36 @@ The class contain the following fields:
 
 ==== Role
 
-Enum representing concrete user authorities. Can be:
+Enum representing a certain user authority. Can be:
 
 `ROLE_ADMIN`::
-user with this type of authority can manage all types of entities except user choices
+user with this type of authority can manage all types of entities except user votes
 `ROLE_USER`::
-user with this type of authority can query all types of entities except other users and their choices, but creating, modifying and deleting for that type of user is forbidden
+user with this type of authority can query all types of entities except other users and their votes, but creating, modifying and deleting is forbidden
 
-==== Choice
+==== Vote
 
-Choice object represents a user choice of restaurant. A choice object shares id with the related user and in case of the user deleted, the related choice is also being deleted.
+Vote object represents a user choice of restaurant. A vote object shares id with the related user and in case of the user being deleted, the related vote is also being deleted.
 
 Contains the following fields:
 
 |====
 | *Name* | *Type* | *Description*
-| userId | Integer | The identifier of related user. Also serves as identifier of a choice since only one choice for a user can exist
-| user | User | The related user. By default this field is not included on querying a choice
+| userId | Integer | The identifier of related user. Also serves as identifier of a vote since only one vote per user can exist
+| user | User | The related user. By default this field is not included on querying a vote
 | restaurant | Restaurant | A chosen restaurant object. Included on the querying by default
 | dateTime | LocalDateTime | Date and time of creation or last modifying. Creates and modifies automatically
 |====
 
 ==== Restaurant
 
-A restaurant object contains fields describing concrete restaurant. Contains the following fields:
+A restaurant object contains fields describing certain restaurant. Contains the following fields:
 
 |====
 | *Name* | *Type* | *Description*
 | id | Integer | Unique identifier of the restaurant
-| name | String | *Unique* name of the restaurant
-| choices | List<Choice> | List of user choices of that restaurant
+| name | String | Unique name of the restaurant
+| votes | List<Vote> | List of user votes of that restaurant
 |====
 
 ==== Menu
@@ -92,12 +91,10 @@ Contains following fields:
 |====
 | *Name* | *Type* | *Optional* | *Description*
 | id | Integer | true | Unique identifier of the dish
-| name | String | false | Name of the dish, should be unique per every concrete menu
+| name | String | false | Name of the dish, should be unique per every certain menu
 | price | Integer | false | Price of the dish
 | menu | Menu | The related menu object
 |====
-
-:numbered:
 
 === URI structure
 
@@ -106,9 +103,9 @@ and querying an item not at the nested endpoint.
 If creation path to a nested resource is longer than two items, then first elements of the path are omitted
 to keep resource structure simple and straightforward. For example:
 
-- `POST restaurant` creates a new restaurant and returns a link to the created restaurant along with it's
+- `POST restaurants` creates a new restaurant and returns a link to the created restaurant along with it's
 json representation in the body
-- `POST restaurant/{restaurantId}/menu` when a restaurant is put, creates the new menu and returns a link
+- `POST restaurants/{restaurantId}/menu` when a restaurant is put, creates the new menu and returns a link
 to the created menu along with the json representation in the body
 - `PUT menus/{restaurantId}` modifies a menu
 - `POST menus/{restaurantId}/dishes` if a restaurant and it's menu is put, creates the new dish,
@@ -127,8 +124,6 @@ The object has `url` and `details` fields:
 :class: dish-rest-controller-test
 :method: create-name-invalid
 include::example.adoc[]
-
-:numbered:
 
 == General User Functionality
 
@@ -269,13 +264,13 @@ include::example.adoc[]
 include::example.adoc[]
 
 `422 Unprocessable Entity`::
-    _if any field of the user has not passed binding stage validation_
+    _if any field of the user has not passed binding-stage validation_
 
 :method: update-password-invalid
 include::example.adoc[]
 
 `409 Conflict`::
-    _if one or more of the user's field values already exist_
+    _if one or more of the user's field values is already existing_
 
 :method: update-email-duplicate
 include::example.adoc[]
@@ -317,26 +312,26 @@ include::example.adoc[]
 
 === Voting
 
-:class: choice-rest-controller-test
+:class: vote-rest-controller-test
 
-==== Make choice
+==== Vote
 
-Creates choice for authorized user using `restaurantId` URL parameter and returns it's data in json format.
+Creates a vote for authorized user using `restaurantId` query parameter and returns it's data in json format.
 
 * *URL*
 
-`POST profile/choice/{restaurantId}`
+`POST profile/vote`
 
 * *Path params*
 
-|====
-| *Name* | *Type* | *Optional* | *Description*
-| restaurantId | Integer | false | The identifier of restaurant to choose
-|====
+None
 
 * *Query params*
 
-None
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant to vote for
+|====
 
 * *Body params*
 
@@ -358,7 +353,7 @@ include::example.adoc[]
 include::example.adoc[]
 
 `409 Conflict`::
-    _if `choice` for authorized user already exist_
+    _if `vote` for authorized user already exists_
 
 :method: create-already-exist
 include::example.adoc[]
@@ -369,13 +364,13 @@ include::example.adoc[]
 :method: create-unauthorized
 include::example.adoc[]
 
-==== Show choice
+==== Show a vote
 
-Returns json data about authorized user's choice.
+Returns json data about authorized user's vote.
 
 * *URL*
 
-`GET profile/choice`
+`GET profile/vote`
 
 * *Path params*
 
@@ -399,7 +394,7 @@ _in case of successful request execution_
 include::example.adoc[]
 
 `404 Not Found`::
-    _if choice for authorized user has not been found_
+    _if vote for authorized user has not been found_
 
 :method: get-not-found
 include::example.adoc[]
@@ -410,9 +405,9 @@ include::example.adoc[]
 :method: get-unauthorized
 include::example.adoc[]
 
-==== Change choice
+==== Change a vote
 
-Updates authorized user's choice. If it is in the same day as the choice has been created:
+Updates authorized user's vote. If it is in the same day as the vote has been created:
 --
 [circle]
 * if it is before 11:00 we assume that he changed his mind;
@@ -421,18 +416,18 @@ Updates authorized user's choice. If it is in the same day as the choice has bee
 
 * *URL*
 
-`PUT profile/choice/{restaurantId}`
+`PUT profile/vote`
 
 * *Path params*
 
-|====
-| *Name* | *Type* | *Optional* | *Description*
-| restaurantId | Integer | false | The identifier of restaurant to choose
-|====
+None
 
 * *Query params*
 
-None
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| restaurantId | Integer | false | The identifier of restaurant to vote for
+|====
 
 * *Body params*
 
@@ -448,13 +443,13 @@ None
 include::example.adoc[]
 
 `404 Not Found`::
-    _if either restaurant with `id=restaurantId` or choice for the user has not been found_
+    _if either restaurant with `id=restaurantId` or vote for the user has not been found_
 
 :method: update-not-found
 include::example.adoc[]
 
 `409 Conflict`::
-    _if choice cannot be changed right now_
+    _if vote cannot be changed right now_
 
 :method: update-too-late
 include::example.adoc[]
@@ -465,7 +460,7 @@ include::example.adoc[]
 :method: update-unauthorized
 include::example.adoc[]
 
-=== Restaurant, menus and dishes retrieval endpoints
+=== Restaurant, menus and dishes retrieval
 
 ==== Show all restaurants
 
@@ -523,7 +518,7 @@ Return json data about single restaurant.
 
 |====
 | *Name* | *Type* | *Optional* | *Description*
-| restaurantId | Integer | true | The value indicating whenever to fetch or not the related list of choices, `false` by default
+| restaurantId | Integer | true | The value indicating whenever to fetch or not the related list of votes, `false` by default
 |====
 
 * *Body params*
@@ -909,13 +904,13 @@ _if user with specified `id` has not been found_
 include::example.adoc[]
 
 `422 Unprocessable Entity`::
-_if any field of the user has not passed binding stage validation_
+_if any field of the user has not passed binding-stage validation_
 
 :method: update-password-invalid
 include::example.adoc[]
 
 `409 Conflict`::
-_if one or more of the user's field values already exist_
+_if one or more of the user's field values already exists_
 
 :method: update-email-duplicate
 include::example.adoc[]
@@ -1111,13 +1106,13 @@ _if restaurant with specified `id` has not been found_
 include::example.adoc[]
 
 `422 Unprocessable Entity`::
-_if any field of the restaurant has not passed binding stage validation_
+_if any field of the restaurant has not passed binding-stage validation_
 
 :method: update-name-invalid
 include::example.adoc[]
 
 `409 Conflict`::
-_if one or more of the restaurant field values already exist_
+_if one or more of the restaurant field values already exists_
 
 :method: update-name-duplicate
 include::example.adoc[]
@@ -1235,7 +1230,7 @@ _if any dish from menu `dishes` field has not passed binding-stage validation or
 include::example.adoc[]
 
 `409 Conflict`::
-_if menu for the restaurant is already exist or the menu contains dishes with duplicate `name` field value_
+_if menu for the restaurant is already existing or the menu contains dishes with duplicate `name` field value_
 
 :method: create-already-exist
 include::example.adoc[]
@@ -1310,7 +1305,7 @@ _if any dish from menu `dishes` field has not passed binding-stage validation or
 include::example.adoc[]
 
 `409 Conflict`::
-_if menu for the restaurant is already exist or the menu contains dishes with duplicate `name` field value_
+_if menu for the restaurant is already existing or the menu contains dishes with duplicate `name` field value_
 
 :method: update-dish-name-duplicate
 include::example.adoc[]

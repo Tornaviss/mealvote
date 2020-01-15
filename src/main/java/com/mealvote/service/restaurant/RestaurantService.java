@@ -51,7 +51,7 @@ public class RestaurantService {
         checkNotFoundWithId(repository.delete(id) != 0, id, "restaurant");
     }
 
-    public Restaurant getWithChoices(int id) {
-        return checkNotFoundWithId(repository.getWithChoices(id), id, "restaurant");
+    public Restaurant getWithVotes(int id) {
+        return checkNotFoundWithId(repository.getWithVotes(id), id, "restaurant");
     }
 }

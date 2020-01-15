@@ -35,7 +35,7 @@ import java.util.regex.Pattern;
 public class ExceptionInfoHandler {
     private static Logger log = LoggerFactory.getLogger(ExceptionInfoHandler.class);
 
-    private static final Pattern uriPattern = Pattern.compile("(/\\D+/)+(\\d+)(/\\D+/)*");
+    private static final Pattern URI_PATTERN = Pattern.compile("(/\\D+/)+(\\d+)(/\\D+/)*");
 
     private static final Map<String, String> CONSTRAINTS_MAP = Map.of(
             "users_unique_email_idx", "user with this email already exists",
@@ -43,13 +43,13 @@ public class ExceptionInfoHandler {
             "constraint_index_b", "restaurant with this name already exists",
             "restaurant_unique_idx_index_4", "menu for this restaurant already exists",
             "constraint_45", "restaurant for this menu doesn't exist",
-            "constraint_e0", "restaurant for this choice doesn't exist",
+            "constraint_c70", "restaurant for this vote doesn't exist",
             "constraint_78", "menu for this dish doesn't exist"
     );
 
     private static final Map<String, String> ENTITY_NOT_FOUND_CONSTRAINTS = Map.of(
             "constraint_45", "restaurant",
-            "constraint_e0", "restaurant",
+            "constraint_c70", "restaurant",
             "constraint_78", "menu"
     );
 
@@ -69,7 +69,7 @@ public class ExceptionInfoHandler {
                 Map.Entry<String, String> presented = entry.get();
                 if (ENTITY_NOT_FOUND_CONSTRAINTS.containsKey(presented.getKey())) {
                     response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                    return handleAsNotFound(req, ENTITY_NOT_FOUND_CONSTRAINTS.get(presented.getKey()));
+                    return handleAsNotFound(req, ENTITY_NOT_FOUND_CONSTRAINTS.get(presented.getKey()), e);
                 }
                 return logAndGetErrorInfo(req, e, false, entry.get().getValue());
             }
@@ -77,14 +77,14 @@ public class ExceptionInfoHandler {
         return logAndGetErrorInfo(req, e, true);
     }
 
-    private ExceptionInfo handleAsNotFound(HttpServletRequest req, String entityType) {
+    private ExceptionInfo handleAsNotFound(HttpServletRequest req, String entityType, Exception cause) {
         String uri = req.getRequestURI();
-        Matcher notFoundIdMatcher = uriPattern.matcher(uri);
+        Matcher notFoundIdMatcher = URI_PATTERN.matcher(uri);
 
         // result is always true as request uri is always well-formed on this layer, hence it matches the pattern
         notFoundIdMatcher.find();
 
-        return entityNotFound(req, new NotFoundException(entityType + " with id = " + notFoundIdMatcher.group(2)));
+        return entityNotFound(req, new NotFoundException(entityType + " with id = " + notFoundIdMatcher.group(2), cause));
     }
 
     @ResponseStatus(value = HttpStatus.CONFLICT)

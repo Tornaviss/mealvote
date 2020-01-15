@@ -1,8 +1,8 @@
 package com.mealvote.service.user;
 
-import com.mealvote.model.user.Choice;
+import com.mealvote.model.user.Vote;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
-import com.mealvote.repository.user.CrudChoiceRepository;
+import com.mealvote.repository.user.CrudVoteRepository;
 import com.mealvote.repository.user.CrudUserRepository;
 import com.mealvote.util.exception.TemporaryUnavailableOperationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,37 +19,37 @@ import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 
 @Service
 @Transactional(readOnly = true)
-public class ChoiceService {
+public class VoteService {
 
-    private final CrudChoiceRepository repository;
+    private final CrudVoteRepository repository;
 
     private final CrudRestaurantRepository restaurantRepository;
 
     private final CrudUserRepository userRepository;
 
     @Autowired
-    public ChoiceService(CrudChoiceRepository repository, CrudRestaurantRepository restaurantRepository,
-                         CrudUserRepository userRepository) {
+    public VoteService(CrudVoteRepository repository, CrudRestaurantRepository restaurantRepository,
+                       CrudUserRepository userRepository) {
         this.repository = repository;
         this.restaurantRepository = restaurantRepository;
         this.userRepository = userRepository;
     }
 
-    public List<Choice> getAll() {
+    public List<Vote> getAll() {
         return repository.getAll();
     }
 
-    public Choice get(int userId) {
-        return checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "choice");
+    public Vote get(int userId) {
+        return checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "vote");
     }
 
     @Transactional
-    public Choice create(int restaurantId, int userId) {
-        Choice choice = new Choice(
+    public Vote create(int restaurantId, int userId) {
+        Vote vote = new Vote(
                 userRepository.getOne(userId),
                 checkNotFoundWithId(restaurantRepository.findById(restaurantId).orElse(null), restaurantId, "restaurant")
         );
-        return repository.save(choice);
+        return repository.save(vote);
     }
 
     @Transactional
@@ -59,10 +59,10 @@ public class ChoiceService {
 
     @Transactional
     public void update(int restaurantId, int userId, LocalTime deadline) {
-        Choice choice = checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "choice");
-        if (isTimeToChangeMind(choice.getDateTime(), deadline)) {
-            choice.setRestaurant(restaurantRepository.getOne(restaurantId));
-            choice.setDateTime(LocalDateTime.now());
+        Vote vote = checkNotFoundWithId(repository.findById(userId).orElse(null), userId, "vote");
+        if (isTimeToChangeMind(vote.getDateTime(), deadline)) {
+            vote.setRestaurant(restaurantRepository.getOne(restaurantId));
+            vote.setDateTime(LocalDateTime.now());
         } else {
             throw new TemporaryUnavailableOperationException("voting is over for today, try again tomorrow");
         }

@@ -23,7 +23,7 @@ public class MenuUtil {
                 newDishes.add(updated);
                 continue;
             }
-            boolean found = foundAndCopyState(updated, menu.getDishes());
+            boolean found = findAndCopyState(updated, menu.getDishes());
             if (found) {
                 completionMap.remove(updated.getId());
             } else {
@@ -35,7 +35,7 @@ public class MenuUtil {
         menu.getDishes().addAll(newDishes);
     }
 
-    private static boolean foundAndCopyState(Dish toFound, List<Dish> dishes) {
+    private static boolean findAndCopyState(Dish toFound, List<Dish> dishes) {
         for (Dish dish : dishes) {
             if (toFound.getId().equals(dish.getId())) {
                 dish.setName(toFound.getName());

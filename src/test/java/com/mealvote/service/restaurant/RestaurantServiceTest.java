@@ -1,6 +1,6 @@
 package com.mealvote.service.restaurant;
 
-import com.mealvote.ChoiceTestData;
+import com.mealvote.VoteTestData;
 import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.util.exception.NotFoundException;
 import org.junit.jupiter.api.Test;
@@ -14,7 +14,7 @@ import java.util.Collections;
 
 import static com.mealvote.AssertionUtils.asSortedList;
 import static com.mealvote.AssertionUtils.assertMatch;
-import static com.mealvote.ChoiceTestData.USER_CHOICE;
+import static com.mealvote.VoteTestData.USER_VOTE;
 import static com.mealvote.RestaurantTestData.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -110,9 +110,9 @@ class RestaurantServiceTest {
     }
 
     @Test
-    void getWithChoices() {
-        Restaurant actual = service.getWithChoices(DOMINOS_ID);
-        assertMatch(actual.getChoices(), Collections.singletonList(USER_CHOICE), ChoiceTestData.IGNORED_FIELDS);
+    void getWithVotes() {
+        Restaurant actual = service.getWithVotes(DOMINOS_ID);
+        assertMatch(actual.getVotes(), Collections.singletonList(USER_VOTE), VoteTestData.IGNORED_FIELDS);
     }
 
 }

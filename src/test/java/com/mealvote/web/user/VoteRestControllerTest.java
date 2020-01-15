@@ -1,8 +1,8 @@
 package com.mealvote.web.user;
 
 import com.mealvote.RestaurantTestData;
-import com.mealvote.model.user.Choice;
-import com.mealvote.service.user.ChoiceService;
+import com.mealvote.model.user.Vote;
+import com.mealvote.service.user.VoteService;
 import com.mealvote.util.DateTimeUtil;
 import com.mealvote.web.AbstractRestControllerTest;
 import org.junit.jupiter.api.Assertions;
@@ -19,22 +19,22 @@ import java.time.format.DateTimeFormatter;
 
 import static com.mealvote.AssertionUtils.assertMatch;
 import static com.mealvote.AssertionUtils.contentJson;
-import static com.mealvote.ChoiceTestData.IGNORED_FIELDS;
-import static com.mealvote.ChoiceTestData.USER_CHOICE;
+import static com.mealvote.VoteTestData.IGNORED_FIELDS;
+import static com.mealvote.VoteTestData.USER_VOTE;
 import static com.mealvote.JsonParseUtils.readFromJson;
 import static com.mealvote.RestaurantTestData.*;
 import static com.mealvote.UserTestData.*;
-import static com.mealvote.web.user.ChoiceRestController.REST_URL;
+import static com.mealvote.web.user.VoteRestController.REST_URL;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-class ChoiceRestControllerTest extends AbstractRestControllerTest {
+class VoteRestControllerTest extends AbstractRestControllerTest {
 
     @Autowired
-    private ChoiceService service;
+    private VoteService service;
 
     private static final String MAX_TIME_FORMATTED;
     private static final String MIN_TIME_FORMATTED;
@@ -51,7 +51,7 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
                 .andDo(print())
                 .andExpect(status().isOk())
                 .andExpect(content().contentTypeCompatibleWith(MediaType.APPLICATION_JSON))
-                .andExpect(contentJson(USER_CHOICE, Choice.class, IGNORED_FIELDS));
+                .andExpect(contentJson(USER_VOTE, Vote.class, IGNORED_FIELDS));
     }
 
     @Test
@@ -72,11 +72,12 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Test
     void update() throws Exception {
         mockMvc.perform(
-                put(REST_URL + "/" + VEGANO_ID + "/" + MAX_TIME_FORMATTED)
+                put(REST_URL + "/" + MAX_TIME_FORMATTED)
+                        .param("restaurantId", VEGANO_ID.toString())
                         .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isNoContent());
-        Choice updated = service.get(USER_ID);
+        Vote updated = service.get(USER_ID);
         Assertions.assertEquals(VEGANO_ID, updated.getRestaurant().getId());
         Assertions.assertEquals(VEGANO.getName(), updated.getRestaurant().getName());
     }
@@ -84,8 +85,9 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Test
     void updateNotFound() throws Exception {
         mockMvc.perform(
-                put(REST_URL + "/" + VEGANO_ID + "/"
+                put(REST_URL + "/"
                         + MAX_TIME_FORMATTED)
+                        .param("restaurantId", VEGANO_ID.toString())
                         .with(userHttpBasic(ADMIN)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -95,7 +97,8 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Transactional(propagation = Propagation.NEVER)
     void updateRestaurantNotFound() throws Exception {
         mockMvc.perform(
-                put(REST_URL + "/" + 1 + "/" + MAX_TIME_FORMATTED)
+                put(REST_URL + "/" + MAX_TIME_FORMATTED)
+                        .param("restaurantId", "1")
                         .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -103,8 +106,9 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
 
     @Test
     void updateTooLate() throws Exception {
-        ResultActions action = mockMvc.perform(
-                put(REST_URL + "/" + VEGANO_ID + "/" + MIN_TIME_FORMATTED)
+        mockMvc.perform(
+                put(REST_URL + "/" + MIN_TIME_FORMATTED)
+                        .param("restaurantId", VEGANO_ID.toString())
                         .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isConflict());
@@ -113,27 +117,30 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Test
     void updateUnauthorized() throws Exception {
         mockMvc.perform(
-                put(REST_URL + "/" + 1 + "/" + MAX_TIME_FORMATTED))
+                put(REST_URL + "/" + MAX_TIME_FORMATTED)
+                        .param("restaurantId", "1"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
 
     @Test
     void create() throws Exception {
-        ResultActions action = mockMvc.perform(post(REST_URL + "/" + DOMINOS_ID)
+        ResultActions action = mockMvc.perform(post(REST_URL)
+                .param("restaurantId", DOMINOS_ID.toString())
                 .with(userHttpBasic(ADMIN)))
                 .andDo(print())
                 .andExpect(status().isCreated());
 
-        Choice returned = readFromJson(action, Choice.class);
-        Choice actual = service.get(ADMIN_ID);
+        Vote returned = readFromJson(action, Vote.class);
+        Vote actual = service.get(ADMIN_ID);
         assertMatch(actual, returned, IGNORED_FIELDS);
         assertMatch(actual.getRestaurant(), returned.getRestaurant(), RestaurantTestData.IGNORED_FIELDS);
     }
 
     @Test
     void createRestaurantNotFound() throws Exception {
-        mockMvc.perform(post(REST_URL + "/" + 1)
+        mockMvc.perform(post(REST_URL)
+                .param("restaurantId", "1")
                 .with(userHttpBasic(ADMIN)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
@@ -142,7 +149,8 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void createAlreadyExist() throws Exception {
-        mockMvc.perform(post(REST_URL + "/" + VEGANO_ID)
+        mockMvc.perform(post(REST_URL)
+                .param("restaurantId", VEGANO_ID.toString())
                 .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isConflict());
@@ -150,7 +158,8 @@ class ChoiceRestControllerTest extends AbstractRestControllerTest {
 
     @Test
     void createUnauthorized() throws Exception {
-        mockMvc.perform(post(REST_URL + "/" + 1))
+        mockMvc.perform(post(REST_URL)
+                .param("restaurantId", VEGANO_ID.toString()))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }

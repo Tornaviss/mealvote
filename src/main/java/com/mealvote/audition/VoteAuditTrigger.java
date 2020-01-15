@@ -11,8 +11,8 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
 
-public class ChoiceAuditTrigger implements Trigger {
-    private static final Logger LOGG = LoggerFactory.getLogger(ChoiceAuditTrigger.class);
+public class VoteAuditTrigger implements Trigger {
+    private static final Logger LOGG = LoggerFactory.getLogger(VoteAuditTrigger.class);
 
     private int operation;
 
@@ -29,7 +29,7 @@ public class ChoiceAuditTrigger implements Trigger {
                              : prepareDeleteStatement(connection, oldRow))) {
             stmt.execute();
         } catch(SQLException e) {
-            LOGG.warn("failed to preserve history for choice with id {}", newRow[0]);
+            LOGG.warn("failed to preserve history for vote with id {}", newRow[0]);
         }
     }
 
@@ -45,7 +45,7 @@ public class ChoiceAuditTrigger implements Trigger {
 
     private PreparedStatement prepareSaveStatement(Connection connection, Object[] newRow) throws SQLException {
         PreparedStatement stmt = connection.prepareStatement(
-                "INSERT INTO user_choices_history (user_id, restaurant_id, date_time, action, username, action_timestamp) " +
+                "INSERT INTO user_votes_history (user_id, restaurant_id, date_time, action, username, action_timestamp) " +
                         "VALUES (?, ?, ?, ?, ?, ?)");
         stmt.setInt(1, (Integer) newRow[0]);
         stmt.setInt(2, (Integer) newRow[1]);
@@ -66,7 +66,7 @@ public class ChoiceAuditTrigger implements Trigger {
     }
 
     private PreparedStatement prepareDeleteStatement(Connection connection, Object[] oldRow) throws SQLException {
-        PreparedStatement stmt = connection.prepareStatement("UPDATE user_choices_history " +
+        PreparedStatement stmt = connection.prepareStatement("UPDATE user_votes_history " +
                 "SET active=false " +
                 "WHERE user_id=?");
         stmt.setInt(1, (Integer) oldRow[0]);

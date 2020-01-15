@@ -12,8 +12,8 @@ import java.time.LocalDateTime;
 
 @Entity
 @Access(AccessType.FIELD)
-@Table(name = "user_choices")
-public class Choice {
+@Table(name = "user_votes")
+public class Vote {
 
     @Id
     private Integer userId;
@@ -29,29 +29,24 @@ public class Choice {
     @JsonInclude(value = JsonInclude.Include.NON_NULL)
     private Restaurant restaurant;
 
-    @Column(name = "date_time", nullable = false, columnDefinition = "timestamp(0) default now()")
+    @Column(name = "date_time", nullable = false, columnDefinition = "timestamp default now()")
     @JsonFormat(pattern = DateTimeUtil.DATE_TIME_PATTERN)
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private LocalDateTime dateTime = LocalDateTime.now();
 
-    public Choice() {
+    public Vote() {
     }
 
-    public Choice(User user, Restaurant restaurant) {
+    public Vote(User user, Restaurant restaurant) {
         this(null, user, restaurant, LocalDateTime.now());
     }
 
-    public Choice(Integer userId, User user, Restaurant restaurant, LocalDateTime dateTime) {
+    public Vote(Integer userId, User user, Restaurant restaurant, LocalDateTime dateTime) {
         this.userId = userId;
         this.user = user;
         this.restaurant = restaurant;
         this.dateTime = dateTime;
     }
-//
-//    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-//    public Integer getUserId() {
-//        return user == null ? null : user.getId();
-//    }
 
     public User getUser() {
         return user;
@@ -79,7 +74,7 @@ public class Choice {
 
     @Override
     public String toString() {
-        return "Choice{" +
+        return "Vote{" +
                 "userId=" + userId +
 //                ", restaurant=" + restaurant +
                 ", dateTime=" + dateTime +

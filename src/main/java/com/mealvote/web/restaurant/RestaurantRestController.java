@@ -36,9 +36,9 @@ public class RestaurantRestController {
     @GetMapping("/{id}")
     public Restaurant get(
             @PathVariable int id,
-            @RequestParam(value = "includeChoices", required = false, defaultValue = "false") boolean includeChoices) {
-        LOGG.info("get {} " + (includeChoices ? "including" : "not including") + " choices for user {}", id, authUserId());
-        return includeChoices ? eraseParentLinks(service.getWithChoices(id)) : service.get(id);
+            @RequestParam(value = "includeVotes", required = false, defaultValue = "false") boolean includeVotes) {
+        LOGG.info("get {} " + (includeVotes ? "including" : "not including") + " votes for user {}", id, authUserId());
+        return includeVotes ? eraseParentLinks(service.getWithVotes(id)) : service.get(id);
     }
 
     @DeleteMapping("/{id}")
@@ -75,7 +75,7 @@ public class RestaurantRestController {
     }
 
     private static Restaurant eraseParentLinks(Restaurant restaurant) {
-        restaurant.getChoices().forEach(choice -> choice.setRestaurant(null));
+        restaurant.getVotes().forEach(vote -> vote.setRestaurant(null));
         return restaurant;
     }
 }

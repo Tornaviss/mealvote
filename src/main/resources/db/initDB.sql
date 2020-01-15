@@ -1,11 +1,11 @@
 DROP TABLE IF EXISTS dishes_history;
 DROP TABLE IF EXISTS dishes;
 DROP TABLE IF EXISTS menus;
-DROP TABLE IF EXISTS user_choices;
+DROP TABLE IF EXISTS user_votes;
 DROP TABLE IF EXISTS restaurants;
 DROP TABLE IF EXISTS user_roles;
 DROP TABLE IF EXISTS users;
-DROP TABLE IF EXISTS user_choices_history;
+DROP TABLE IF EXISTS user_votes_history;
 DROP SEQUENCE IF EXISTS global_seq;
 DROP SEQUENCE IF EXISTS history_seq;
 
@@ -37,11 +37,11 @@ CREATE TABLE restaurants
     name VARCHAR UNIQUE NOT NULL
 );
 
-CREATE TABLE user_choices
+CREATE TABLE user_votes
 (
-    user_id       INTEGER                    NOT NULL,
-    restaurant_id INTEGER                    NOT NULL,
-    date_time     TIMESTAMP(0) DEFAULT now() NOT NULL,
+    user_id       INTEGER                 NOT NULL,
+    restaurant_id INTEGER                 NOT NULL,
+    date_time     TIMESTAMP DEFAULT now() NOT NULL,
     CONSTRAINT user_id_idx UNIQUE (user_id),
     FOREIGN KEY (user_id) REFERENCES users (id) ON DELETE CASCADE,
     FOREIGN KEY (restaurant_id) REFERENCES restaurants (id) ON DELETE CASCADE
@@ -98,12 +98,12 @@ CREATE TRIGGER dishes_create_audit_trail
     FOR EACH ROW
 CALL "com.mealvote.audition.DishAuditTrigger";
 
-CREATE TABLE user_choices_history
+CREATE TABLE user_votes_history
 (
     history_id       INTEGER DEFAULT history_seq.nextval PRIMARY KEY,
     user_id          INTEGER              NOT NULL,
     restaurant_id    INTEGER              NOT NULL,
-    date_time        TIMESTAMP(0)         NOT NULL,
+    date_time        TIMESTAMP            NOT NULL,
     username         VARCHAR              NOT NULL,
     action_timestamp TIMESTAMP            NOT NULL,
     action           VARCHAR              NOT NULL,
@@ -112,20 +112,20 @@ CREATE TABLE user_choices_history
 
 //trigger classes will become visible in classpath at build time, comment the creation in case of manual DB initialization
 
-CREATE TRIGGER user_choices_create_audit_trigger
+CREATE TRIGGER user_votes_create_audit_trigger
     AFTER INSERT
-    ON user_choices
+    ON user_votes
     FOR EACH ROW
-CALL "com.mealvote.audition.ChoiceAuditTrigger";
+CALL "com.mealvote.audition.VoteAuditTrigger";
 
-CREATE TRIGGER user_choices_update_audit_trigger
+CREATE TRIGGER user_votes_update_audit_trigger
     AFTER UPDATE
-    ON user_choices
+    ON user_votes
     FOR EACH ROW
-CALL "com.mealvote.audition.ChoiceAuditTrigger";
+CALL "com.mealvote.audition.VoteAuditTrigger";
 
-CREATE TRIGGER user_choices_delete_audit_trigger
+CREATE TRIGGER user_votes_delete_audit_trigger
     AFTER DELETE
-    ON user_choices
+    ON user_votes
     FOR EACH ROW
-CALL "com.mealvote.audition.ChoiceAuditTrigger";
+CALL "com.mealvote.audition.VoteAuditTrigger";

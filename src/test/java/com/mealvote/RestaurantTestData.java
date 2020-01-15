@@ -7,7 +7,7 @@ import java.util.Comparator;
 import static com.mealvote.model.AbstractBaseEntity.START_SEQ;
 
 public class RestaurantTestData {
-    public static final String[] IGNORED_FIELDS = {"choices"};
+    public static final String[] IGNORED_FIELDS = {"votes"};
 
     public static final Comparator<Restaurant> COMPARATOR = Comparator.comparing(Restaurant::getName);
 

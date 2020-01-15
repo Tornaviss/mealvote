@@ -2,7 +2,7 @@ package com.mealvote.model.restaurant;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.mealvote.model.AbstractNamedEntity;
-import com.mealvote.model.user.Choice;
+import com.mealvote.model.user.Vote;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -18,7 +18,7 @@ public class Restaurant extends AbstractNamedEntity {
     @OrderBy("dateTime DESC")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @OnDelete(action = OnDeleteAction.CASCADE)
-    private List<Choice> choices;
+    private List<Vote> votes;
 
     public Restaurant() {
     }
@@ -31,17 +31,17 @@ public class Restaurant extends AbstractNamedEntity {
         this(id, name, null);
     }
 
-    public Restaurant(Integer id, String name, List<Choice> choices) {
+    public Restaurant(Integer id, String name, List<Vote> votes) {
         super(id, name);
-        this.choices = choices;
+        this.votes = votes;
     }
 
-    public List<Choice> getChoices() {
-        return choices;
+    public List<Vote> getVotes() {
+        return votes;
     }
 
-    public void setChoices(List<Choice> choices) {
-        this.choices = choices;
+    public void setVotes(List<Vote> votes) {
+        this.votes = votes;
     }
 
     @Override

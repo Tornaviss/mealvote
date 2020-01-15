@@ -33,14 +33,14 @@ ___
 `curl -s -X DELETE http://localhost:8080/mealvote/profile --user user@yandex.ru:password`
 ___
 
-#### get Choice
-`curl -s http://localhost:8080/mealvote/profile/choice --user user@yandex.ru:password`
+#### get Vote
+`curl -s http://localhost:8080/mealvote/profile/vote --user user@yandex.ru:password`
 
-#### create Choice: choose Restaurants 100002
-`curl -s -X POST http://localhost:8080/mealvote/profile/choice/100002 --user admin@gmail.com:admin`
+#### create Vote: choose Restaurants 100002
+`curl -s -X POST http://localhost:8080/mealvote/profile/vote?restaurantId=100002 --user admin@gmail.com:admin`
 
-#### update Choice: choose Restaurants 100003
-`curl -s -X PUT http://localhost:8080/mealvote/profile/choice/100003 --user user@yandex.ru:password`
+#### update Vote: choose Restaurants 100003
+`curl -s -X PUT http://localhost:8080/mealvote/profile/vote?restaurantId=100002 --user user@yandex.ru:password`
 ___
 
 #### create Restaurants
@@ -48,6 +48,9 @@ ___
 
 #### get Restaurants 100002
 `curl -s http://localhost:8080/mealvote/restaurants/100002 --user user@yandex.ru:password`
+
+#### get Restaurants 100002 with Votes
+`curl -s http://localhost:8080/mealvote/restaurants/100002?includeVotes=true --user user@yandex.ru:password`
 
 #### get All Restaurants
 `curl -s http://localhost:8080/mealvote/restaurants --user user@yandex.ru:password`

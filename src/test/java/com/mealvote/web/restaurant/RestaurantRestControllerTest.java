@@ -1,6 +1,6 @@
 package com.mealvote.web.restaurant;
 
-import com.mealvote.ChoiceTestData;
+import com.mealvote.VoteTestData;
 import com.mealvote.model.restaurant.Restaurant;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.web.AbstractRestControllerTest;
@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.Collections;
 
 import static com.mealvote.AssertionUtils.*;
-import static com.mealvote.ChoiceTestData.USER_CHOICE;
+import static com.mealvote.VoteTestData.USER_VOTE;
 import static com.mealvote.JsonParseUtils.readFromJson;
 import static com.mealvote.RestaurantTestData.*;
 import static com.mealvote.UserTestData.ADMIN;
@@ -218,9 +218,9 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
     }
 
     @Test
-    void getWithChoices() throws Exception {
+    void getWithVotes() throws Exception {
         ResultActions action = mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + DOMINOS_ID)
-                .param("includeChoices", "true")
+                .param("includeVotes", "true")
                 .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isOk())
@@ -228,22 +228,22 @@ class RestaurantRestControllerTest extends AbstractRestControllerTest {
                 .andExpect(contentJson(DOMINOS, Restaurant.class, IGNORED_FIELDS));
 
         Restaurant returned = readFromJson(action, Restaurant.class);
-        assertMatch(returned.getChoices(), Collections.singletonList(USER_CHOICE), ChoiceTestData.IGNORED_FIELDS);
+        assertMatch(returned.getVotes(), Collections.singletonList(USER_VOTE), VoteTestData.IGNORED_FIELDS);
     }
 
     @Test
-    void getWithChoicesNotFound() throws Exception {
+    void getWithVotesNotFound() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + 1)
-                .param("includeChoices", "true")
+                .param("includeVotes", "true")
                 .with(userHttpBasic(USER)))
                 .andDo(print())
                 .andExpect(status().isNotFound());
     }
 
     @Test
-    void getWithChoicesUnauthorised() throws Exception {
+    void getWithVotesUnauthorised() throws Exception {
         mockMvc.perform(MockMvcRequestBuilders.get(REST_URL + "/" + 1)
-                .param("includeChoices", "true"))
+                .param("includeVotes", "true"))
                 .andDo(print())
                 .andExpect(status().isUnauthorized());
     }
