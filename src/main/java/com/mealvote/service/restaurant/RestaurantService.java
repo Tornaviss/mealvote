@@ -1,6 +1,8 @@
 package com.mealvote.service.restaurant;
 
+import com.mealvote.model.restaurant.Menu;
 import com.mealvote.model.restaurant.Restaurant;
+import com.mealvote.repository.restaurant.CrudMenuRepository;
 import com.mealvote.repository.restaurant.CrudRestaurantRepository;
 import com.mealvote.util.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -9,6 +11,9 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.Assert;
 
 import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 
@@ -18,18 +23,36 @@ import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 public class RestaurantService {
 
     private CrudRestaurantRepository repository;
+    private CrudMenuRepository menuRepository;
 
     @Autowired
-    public RestaurantService(CrudRestaurantRepository repository) {
+    public RestaurantService(CrudRestaurantRepository repository, CrudMenuRepository menuRepository) {
         this.repository = repository;
+        this.menuRepository = menuRepository;
     }
 
     public List<Restaurant> getAll() {
         return repository.getAll();
     }
 
+    public List<Restaurant> getAll(boolean includeMenu, boolean includeVotes) {
+        return includeMenu ?
+                        includeVotes ? getWithMenuAndVotes() : repository.getAllWithMenu()
+                        :
+                        includeVotes ? repository.getAllWithVotes() : repository.getAll();
+    }
+
     public Restaurant get(int id) {
         return checkNotFoundWithId(repository.findById(id).orElse(null), id, "restaurant");
+    }
+
+    public Restaurant get(int id, boolean includeMenu, boolean includeVotes) {
+        return checkNotFoundWithId(
+                includeMenu ?
+                        includeVotes ? repository.getWithMenuAndVotes(id) : repository.getWithMenu(id)
+                        :
+                        includeVotes ? repository.getWithVotes(id) : repository.findById(id).orElse(null),
+                id, "restaurant");
     }
 
     @Transactional
@@ -51,7 +74,11 @@ public class RestaurantService {
         checkNotFoundWithId(repository.delete(id) != 0, id, "restaurant");
     }
 
-    public Restaurant getWithVotes(int id) {
-        return checkNotFoundWithId(repository.getWithVotes(id), id, "restaurant");
+    private List<Restaurant> getWithMenuAndVotes() {
+        List<Restaurant> restaurants = getAll(false, true);
+        Map<Integer, Menu> idMenuMap = menuRepository.getAll().stream()
+                .collect(Collectors.toMap(Menu::getId, Function.identity()));
+        restaurants.forEach(x -> x.setMenu(idMenuMap.getOrDefault(x.getId(), null)));
+        return restaurants;
     }
 }

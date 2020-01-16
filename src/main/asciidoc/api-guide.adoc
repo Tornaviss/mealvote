@@ -57,7 +57,7 @@ Contains the following fields:
 | userId | Integer | The identifier of related user. Also serves as identifier of a vote since only one vote per user can exist
 | user | User | The related user. By default this field is not included on querying a vote
 | restaurant | Restaurant | A chosen restaurant object. Included on the querying by default
-| dateTime | LocalDateTime | Date and time of creation or last modifying. Creates and modifies automatically
+| dateTime | LocalDateTime | Date and time of creation or last modifying. The field is being created and modified automatically
 |====
 
 ==== Restaurant
@@ -68,7 +68,8 @@ A restaurant object contains fields describing certain restaurant. Contains the 
 | *Name* | *Type* | *Description*
 | id | Integer | Unique identifier of the restaurant
 | name | String | Unique name of the restaurant
-| votes | List<Vote> | List of user votes of that restaurant
+| votes | List<Vote> | List of user votes of that restaurant, , not fetched on querying by default
+| menu | Menu | Menu of the restaurant, , not fetched on querying by default
 |====
 
 ==== Menu
@@ -93,7 +94,7 @@ Contains following fields:
 | id | Integer | true | Unique identifier of the dish
 | name | String | false | Name of the dish, should be unique per every certain menu
 | price | Integer | false | Price of the dish
-| menu | Menu | The related menu object
+| menu | Menu | The related menu object, , not fetched on querying by default
 |====
 
 === URI structure
@@ -478,7 +479,11 @@ None
 
 * *Query params*
 
-None
+|====
+| *Name* | *Type* | *Optional* | *Description*
+| includeMenu | Boolean | false | The value indicating whenever to fetch or not the restaurant's menu, `false` by default
+| includeVotes | Boolean | false | The value indicating whenever to fetch or not the related list of votes, `false` by default
+|====
 
 * *Body params*
 
@@ -518,7 +523,8 @@ Return json data about single restaurant.
 
 |====
 | *Name* | *Type* | *Optional* | *Description*
-| restaurantId | Integer | true | The value indicating whenever to fetch or not the related list of votes, `false` by default
+| includeMenu | Boolean | false | The value indicating whenever to fetch or not the restaurant's menu, `false` by default
+| includeVotes | Boolean | false | The value indicating whenever to fetch or not the related list of votes, `false` by default
 |====
 
 * *Body params*

@@ -14,11 +14,18 @@ import java.util.List;
 @UniqueConstraint(name = "CONSTRAINT_B5", columnNames = {"name"}))
 public class Restaurant extends AbstractNamedEntity {
 
+    public static final String GET_BY_ID = "SELECT r FROM Restaurant r WHERE r.id=?1";
+    public static final String GET_ALL_SORTED = "SELECT r FROM Restaurant r ORDER BY r.name";
+
     @OneToMany(mappedBy = "restaurant", fetch = FetchType.LAZY)
     @OrderBy("dateTime DESC")
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     @OnDelete(action = OnDeleteAction.CASCADE)
     private List<Vote> votes;
+
+    @OneToOne(mappedBy = "restaurant", fetch = FetchType.LAZY, optional = false)
+    @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+    private Menu menu;
 
     public Restaurant() {
     }
@@ -34,6 +41,14 @@ public class Restaurant extends AbstractNamedEntity {
     public Restaurant(Integer id, String name, List<Vote> votes) {
         super(id, name);
         this.votes = votes;
+    }
+
+    public Menu getMenu() {
+        return menu;
+    }
+
+    public void setMenu(Menu menu) {
+        this.menu = menu;
     }
 
     public List<Vote> getVotes() {

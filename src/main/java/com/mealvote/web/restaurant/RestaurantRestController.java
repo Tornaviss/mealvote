@@ -13,6 +13,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import javax.validation.Valid;
 import java.net.URI;
+import java.util.Collections;
 import java.util.List;
 
 import static com.mealvote.util.ValidationUtil.*;
@@ -36,9 +37,15 @@ public class RestaurantRestController {
     @GetMapping("/{id}")
     public Restaurant get(
             @PathVariable int id,
+            @RequestParam(value = "includeMenu", required = false, defaultValue = "false") boolean includeMenu,
             @RequestParam(value = "includeVotes", required = false, defaultValue = "false") boolean includeVotes) {
-        LOGG.info("get {} " + (includeVotes ? "including" : "not including") + " votes for user {}", id, authUserId());
-        return includeVotes ? eraseParentLinks(service.getWithVotes(id)) : service.get(id);
+        LOGG.info("get {} " +
+                (includeMenu ? "together with menu " : "without menu ") +
+                (includeVotes ? "including " : "not including ") + "votes " +
+                "for user {}", id, authUserId());
+
+        Restaurant result = service.get(id, includeMenu, includeVotes);
+        return includeVotes ? eraseParentLinks(Collections.singletonList(result)).get(0) : result;
     }
 
     @DeleteMapping("/{id}")
@@ -49,9 +56,16 @@ public class RestaurantRestController {
     }
 
     @GetMapping
-    public List<Restaurant> getAll() {
-        LOGG.info("getAll for user {}", authUserId());
-        return service.getAll();
+    public List<Restaurant> getAll(
+            @RequestParam(value = "includeMenu", required = false, defaultValue = "false") boolean includeMenu,
+            @RequestParam(value = "includeVotes", required = false, defaultValue = "false") boolean includeVotes) {
+        LOGG.info("getAll " +
+                (includeMenu ? "together with menu " : "without menu ") +
+                (includeVotes ? "including " : "not including ") + "votes " +
+                "for user {}", authUserId());
+
+        List<Restaurant> result = service.getAll(includeMenu, includeVotes);
+        return includeVotes ? eraseParentLinks(result) : result;
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.APPLICATION_JSON_VALUE)
@@ -74,8 +88,10 @@ public class RestaurantRestController {
         return ResponseEntity.created(uriOfNewResource).body(created);
     }
 
-    private static Restaurant eraseParentLinks(Restaurant restaurant) {
-        restaurant.getVotes().forEach(vote -> vote.setRestaurant(null));
-        return restaurant;
+    private static List<Restaurant> eraseParentLinks(List<Restaurant> restaurants) {
+        restaurants.forEach(
+                x -> x.getVotes().forEach(vote -> vote.setRestaurant(null))
+        );
+        return restaurants;
     }
 }
