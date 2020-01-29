@@ -3,3 +3,4 @@ exclude_paths:
   - 'README.md'
   - '**.sql'
   - '**.xml'
+  - '**.md'
