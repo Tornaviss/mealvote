@@ -25,6 +25,7 @@ public class Restaurant extends AbstractNamedEntity {
 
     @OneToOne(mappedBy = "restaurant", fetch = FetchType.LAZY, optional = false)
     @JsonInclude(value = JsonInclude.Include.NON_EMPTY)
+    @OnDelete(action = OnDeleteAction.CASCADE)
     private Menu menu;
 
     public Restaurant() {

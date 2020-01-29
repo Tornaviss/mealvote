@@ -26,7 +26,6 @@ VALUES ('Dominos Pizza'),
 
 INSERT INTO user_votes (user_id, restaurant_id)
 VALUES (100000, 100002);
--- (100001, 100003);
 
 INSERT INTO menus (restaurant_id)
 VALUES (100002),

@@ -74,8 +74,9 @@ CREATE TABLE dishes_history
     price            INTEGER              NOT NULL,
     username         VARCHAR              NOT NULL,
     action           VARCHAR              NOT NULL,
-    action_timestamp TIMESTAMP            NOT NULL,
-    active           BOOLEAN DEFAULT TRUE NOT NULL
+    action_timestamp TIMESTAMP DEFAULT now()          NOT NULL,
+    active           BOOLEAN DEFAULT TRUE NOT NULL,
+    CONSTRAINT id_history_id_unique_idx UNIQUE(id, history_id)
 );
 
 //trigger classes will become visible in classpath at build time, comment the creation in case of manual DB initialization
@@ -105,9 +106,10 @@ CREATE TABLE user_votes_history
     restaurant_id    INTEGER              NOT NULL,
     date_time        TIMESTAMP            NOT NULL,
     username         VARCHAR              NOT NULL,
-    action_timestamp TIMESTAMP            NOT NULL,
+    action_timestamp TIMESTAMP DEFAULT now()            NOT NULL,
     action           VARCHAR              NOT NULL,
-    active           BOOLEAN DEFAULT TRUE NOT NULL
+    active           BOOLEAN DEFAULT TRUE NOT NULL,
+    CONSTRAINT user_id_history_id_unique_idx UNIQUE(user_id, history_id)
 );
 
 //trigger classes will become visible in classpath at build time, comment the creation in case of manual DB initialization

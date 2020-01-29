@@ -12,6 +12,7 @@ public abstract class AbstractBaseEntity implements HasId {
     @Id
     @SequenceGenerator(name = "global_generator", sequenceName = "global_seq", initialValue = START_SEQ, allocationSize = 1)
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "global_generator")
+    @Access(AccessType.PROPERTY)
     //  https://hibernate.atlassian.net/browse/HHH-12034
     //  Proxy initialization when accessing its identifier managed now by JPA_PROXY_COMPLIANCE setting
     protected Integer id;

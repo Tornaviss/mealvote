@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 public class Vote {
 
     @Id
+    @Access(AccessType.PROPERTY)
     private Integer userId;
 
     @OneToOne(fetch = FetchType.LAZY)
@@ -48,6 +49,14 @@ public class Vote {
         this.dateTime = dateTime;
     }
 
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+
     public User getUser() {
         return user;
     }
@@ -76,7 +85,6 @@ public class Vote {
     public String toString() {
         return "Vote{" +
                 "userId=" + userId +
-//                ", restaurant=" + restaurant +
                 ", dateTime=" + dateTime +
                 '}';
     }

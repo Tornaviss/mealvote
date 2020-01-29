@@ -93,7 +93,7 @@ Contains following fields:
 | *Name* | *Type* | *Optional* | *Description*
 | id | Integer | true | Unique identifier of the dish
 | name | String | false | Name of the dish, should be unique per every certain menu
-| price | Integer | false | Price of the dish
+| price | Integer | false | Price of the dish in cents
 | menu | Menu | The related menu object, , not fetched on querying by default
 |====
 
@@ -1212,7 +1212,7 @@ Every item of the `dishes` array should contain the following fields:
 | *Name* | *Type* | *Optional* | *Description* | *Constrains*
 | id | Integer | true | Unique identifier of the dish | Must be `null`
 | name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
-| price | Integer | false | Price of the dish | Must be greater than 1
+| price | Integer | false | Price of the dish in cents | Must be greater than 1
 |====
 * *Status codes*
 --
@@ -1278,7 +1278,7 @@ Every item of the `dishes` array should contain the following fields:
 | *Name* | *Type* | *Optional* | *Description* | *Constrains*
 | id | Integer | true | Unique identifier of the dish | If presented, must match any existing one
 | name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
-| price | Integer | false | Price of the dish | Must be greater than 1
+| price | Integer | false | Price of the dish in cents | Must be greater than 1
 |====
 
 IMPORTANT:: If you want to update some dish containing in the menu you should include it's updated fields
@@ -1461,7 +1461,7 @@ None
 | *Name* | *Type* | *Optional* | *Description* | *Constrains*
 | id | Integer | false | Unique identifier of the dish | Must not be `null` and should match `id` path parameter value
 | name | String | false | Name of the dish | *Unique per menu.* Must be between 2 and 100 characters long
-| price | Integer | false | Price of the dish | Must be greater than 1
+| price | Integer | false | Price of the dish in cents | Must be greater than 1
 |====
 
 * *Status codes*

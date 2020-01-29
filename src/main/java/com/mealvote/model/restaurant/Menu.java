@@ -21,6 +21,7 @@ import java.util.List;
 public class Menu implements HasId {
 
     @Id
+    @Access(AccessType.PROPERTY)
     private Integer restaurantId;
 
     @Column(name = "date", nullable = false, columnDefinition = "date default now()")
@@ -61,11 +62,21 @@ public class Menu implements HasId {
         this.date = date;
     }
 
+    @Override
     public Integer getId() {
+        return getRestaurantId();
+    }
+
+    @Override
+    public void setId(Integer id) {
+        setRestaurantId(id);
+    }
+
+    public Integer getRestaurantId() {
         return restaurantId;
     }
 
-    public void setId(Integer id) {
+    public void setRestaurantId(Integer id) {
         this.restaurantId = id;
     }
 

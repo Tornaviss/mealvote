@@ -23,6 +23,7 @@ import static com.mealvote.util.ValidationUtil.checkNotFoundWithId;
 public class RestaurantService {
 
     private CrudRestaurantRepository repository;
+
     private CrudMenuRepository menuRepository;
 
     @Autowired
@@ -37,9 +38,9 @@ public class RestaurantService {
 
     public List<Restaurant> getAll(boolean includeMenu, boolean includeVotes) {
         return includeMenu ?
-                        includeVotes ? getWithMenuAndVotes() : repository.getAllWithMenu()
-                        :
-                        includeVotes ? repository.getAllWithVotes() : repository.getAll();
+                includeVotes ? getWithMenuAndVotes() : repository.getAllWithMenu()
+                :
+                includeVotes ? repository.getAllWithVotes() : repository.getAll();
     }
 
     public Restaurant get(int id) {
@@ -74,6 +75,8 @@ public class RestaurantService {
         checkNotFoundWithId(repository.delete(id) != 0, id, "restaurant");
     }
 
+    // Hibernate can't fetch multiple collections with one go (throws MultipleBagFetchException)
+    // https://stackoverflow.com/questions/17566304/multiple-fetches-with-eager-type-in-hibernate-with-jpa
     private List<Restaurant> getWithMenuAndVotes() {
         List<Restaurant> restaurants = getAll(false, true);
         Map<Integer, Menu> idMenuMap = menuRepository.getAll().stream()
