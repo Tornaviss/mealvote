@@ -27,6 +27,15 @@ The project uses in-memory database (H2) so the process is quite straightforward
 
 3. Trigger Maven `package` lifecycle event at least once to test the app and generate api usage guide
 
+<details>
+<summary>Click if you experience an issue with the step</summary>
+
+There may be a problem related to excessive log output into console. Just append your command just like that:
+`mvn clean package > log-file.log` 
+Now all the output will be stored in root of the project as separate log file so the problem will be solved.
+
+</details>
+
 4. Run the app with Tomcat Server configuration with context path `mealvote` (DB will be automatically initialized and populated with a test data)
 
 That's it! Feel free to use URI `/docs` to see the api usage guide with examples.
