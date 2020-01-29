@@ -142,7 +142,7 @@ ___
 #### get All Restaurants with Votes
 `curl -s http://localhost:8080/mealvote/restaurants?includeVotes=true --user user@yandex.ru:password`
 
-#### get All Restaurants with Votes and Menus
+#### get All Restaurants with Menu and Votes
 `curl -s http://localhost:8080/mealvote/restaurants?includeMenu=true&includeVotes=true --user user@yandex.ru:password`
 
 #### update Restaurants 100003
@@ -159,7 +159,7 @@ ___
 `curl -s http://localhost:8080/mealvote/menus/100002 --user user@yandex.ru:password`
 
 #### update Menus 100002
-`curl -s -X PUT -d '{"dishes":[{"name":"backed fork meat","price":"10000"},{"name":"red vine","price":800}]}' -H 'Content-Type: application/json' http://localhost:8080/mealvote/menus/100002 --user admin@gmail.com:admin`
+`curl -s -X PUT -d '{"dishes":[{"name":"baked pork meat","price":"10000"},{"name":"red vine","price":800}]}' -H 'Content-Type: application/json' http://localhost:8080/mealvote/menus/100002 --user admin@gmail.com:admin`
 
 #### delete Menus 100002
 `curl -s -X DELETE http://localhost:8080/mealvote/menus/100002 --user admin@gmail.com:admin`
