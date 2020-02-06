@@ -51,7 +51,7 @@ The project uses in-memory database (H2) so the process is quite straightforward
 
 2. Open the project using an IDE
 
-3. Trigger Maven `package` lifecycle event at least once to test the app and generate api usage guide
+3. Enter `mvn package` in an IDE console at least once to trigger maven `package` lifecycle event, thus running all of unit tests and generating api usage guide
 
 <details>
 <summary>Click if you experience an issue with the step</summary>
@@ -68,7 +68,7 @@ Now all the output will be stored in root of the project as separate log file so
 
 That's it! Feel free to use URI `/docs` to see the api usage guide with examples.
 
-Test available endpoints with curl commands listed above.
+Test available endpoints with curl commands listed below.
 
 <details>
 <summary>CURL samples</summary>
